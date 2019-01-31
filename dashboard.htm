@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>gKréta - Dashboard</title>
+        <script>window.$ = window.jQuery = require("./modules/jquery-3.2.1.min.js");</script>
+        <script>require("./modules/titlebar.js");</script>
+        <link rel="stylesheet" type="text/css" href="./css/general-dark.css" />
+    </head>
+    <body>
+        <div id="title-bar">
+            <div id="title"><script>document.write(document.title)</script></div>
+            <div id="title-bar-btns">
+                    <button id="min-btn" class="title-bar-btn">-</button>
+                    <button id="max-btn" class="title-bar-btn">+</button>
+                    <button id="close-btn" class="title-bar-btn">x</button>
+            </div>
+        </div>
+        <div id="mySidenav" class="sidenav">
+                <a onclick="onNavClick('Dashboard')">Dashboard</a>
+                <a onclick="onNavClick('Evaluations')">Evaluations</a>
+                <a onclick="onNavClick('Timetable')">Timetable</a>
+                <a onclick="onNavClick('Absences')">Absences</a>
+                <a onclick="onNavClick('Settings')">Settings</a>
+        </div>
+        <div id="content">  
+            <script>
+                var ipc=require("electron").ipcRenderer;
+                var isErrorPage = false;
+                ipc.send('getStudentDataAndSendToRenderer');
+                ipc.on("gotStudentData", function studentDataHandler(event,studentData) {
+                    var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
+                    var hr = $("<hr />")
+                    var tabDiv = $("<div id='tabDiv' />")
+                    h1Name.appendTo('#content');
+                    hr.appendTo('#content');
+                    tabDiv.appendTo('#content');
+                    ipc.removeListener("gotStudentData", studentDataHandler);
+                });
+
+                ipc.on("gotError503", function errorDataHandler(event) { 
+                    var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error 503<h1/>");
+                    var hr = $("<hr />")
+                    var tabDiv = $("<div id='tabDiv' />")
+                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
+                    var errorDesc = $("<p>KRÉTA servers are under maintenance.<p/>");
+                    h1Name.appendTo('#content');
+                    hr.appendTo('#content');
+                    tabDiv.appendTo('#content');
+                    errorDescH2.appendTo('#tabDiv');
+                    errorDesc.appendTo('#tabDiv');
+                    ipc.removeListener("gotError503", errorDataHandler);
+                    isErrorPage = true;
+                });
+
+                ipc.on("gotError403", function errorDataHandler(event) { 
+                    var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error 403<h1/>");
+                    var hr = $("<hr />")
+                    var tabDiv = $("<div id='tabDiv' />")
+                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
+                    var errorDesc = $("<p>KRÉTA servers are under maintenance.<p/>");
+                    h1Name.appendTo('#content');
+                    hr.appendTo('#content');
+                    tabDiv.appendTo('#content');
+                    errorDescH2.appendTo('#tabDiv');
+                    errorDesc.appendTo('#tabDiv');
+                    ipc.removeListener("gotError403", errorDataHandler);
+                    isErrorPage = true;
+                });
+                function onNavClick(tab) {
+                    document.title = "gKréta - " + tab;
+                    $('#title').empty();
+                    $('#title').html(document.title);
+
+                    if (!isErrorPage) {
+                        $("#tabDiv").empty();
+                        $("#tabDiv").html("<h2>" + tab + "</h2>");
+                        switch(tab) {
+                            case "Dashboard": {
+                                console.log(tab);
+                                break;
+                            }
+                            
+                            case "Evaluations": {
+                                console.log(tab);
+                                break;
+                            }
+
+                            case "Timetable": {
+                                console.log(tab);
+                                break;
+                            }
+
+                            case "Absences": {
+                                console.log(tab);
+                                break;
+                            }
+
+                            case "Settings": {
+                                console.log(tab);
+                                break;
+                            }
+
+                            default: {
+                                console.log(tab, " oof default case?!!");
+                                break;
+                            }
+                        }
+                    }
+                }
+            </script>
+        </div>
+    </body>
+</html>

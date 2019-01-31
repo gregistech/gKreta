@@ -1,0 +1,14 @@
+{
+  "name": "gkreta",
+  "version": "0.0.1",
+  "description": "It's an application for displaying your infromations from the KRÉTA systems. (Written in Electron)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "thegergo02",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^4.0.3"
+  }
+}
