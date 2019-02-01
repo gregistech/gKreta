@@ -5,6 +5,11 @@ var fs = require('fs');
 var eventEmitter = new events.EventEmitter();
 
 function createWindow () {
+  var dirConf = "conf/";
+  if (!fs.existsSync(dirConf)){
+    fs.mkdirSync(dirConf);
+  }
+
   fs.stat('./conf/logindetails.json', function(err, stat) {
     if(err == null) {
       winDash = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
