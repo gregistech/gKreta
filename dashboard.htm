@@ -49,6 +49,7 @@
 
                 ipc.on("gotStudentData", function studentDataHandler(event,studentDataL, timetableDataL) {
                     studentData = studentDataL;
+                    console.log(studentData);
                     timetableData = timetableDataL;
                     $('#content').empty();
                     var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
@@ -227,7 +228,47 @@
 
                         case "Absences": {
                             $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + tab + "</h2>");                            
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            var absences = studentData.Absences;   
+                            var dates = new Array();
+
+                            for(let i = 0; i < Object.keys(absences).length; i++) {
+                                var currentDate = absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T'));
+                                if (dates.indexOf(currentDate) === -1 && currentDate !== null) {
+                                    dates.push(currentDate);
+                                }
+                            }
+
+                            dates.sort(function(a, b) {
+                                a = new Date(a);
+                                b = new Date(b);
+                                return a>b ? -1 : a<b ? 1 : 0;
+                            });
+
+                            for (j = 0;j < Object.keys(dates).length;j++) {
+                                $("<h2 id='h2" + j + "'><b>" + dates[j] + "</b></h2>").appendTo("#tabDiv");
+                                for (i = 0;i < Object.keys(absences).length;i++) {
+                                    if (absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T')) === dates[j]) {
+                                        console.log(absences[i].JustificationState);
+                                        switch (absences[i].JustificationState) {
+                                            case "BeJustified": {
+                                                var absenceColor = "#ff0202";
+                                                break;
+                                            }
+                                            case "Justified": {
+                                                var absenceColor = "#03a338";
+                                                break;
+                                            }
+                                            default: {
+                                                var absenceColor = "#ff0202";
+                                                break;
+                                            }
+                                        }
+                                        var currentAbsence = $("<p style='color: " + absenceColor +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
+                                        currentAbsence.appendTo("#tabDiv"); 
+                                    } 
+                                }
+                            }                          
                             break;
                         }
 
