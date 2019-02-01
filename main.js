@@ -46,14 +46,17 @@ function createWindow () {
     eventEmitter.on("gotLoginDetails", function loginDetailsHandler(instituteCode,username,password) {
       getStudentData(instituteCode, username, password);
       eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData) {
-        if (studentData === 503) {
-          winDash.webContents.send("gotError", studentData);
-        } else if (studentData === 403) {
-          winDash.webContents.send("gotError", studentData);
-        } else {
-          winDash.webContents.send("gotStudentData",studentData);
-        }
-        eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
+        getTimetableData(instituteCode, username, password, studentData);
+        eventEmitter.on("timetableDownloaded", function timetableHandler(studentData, timetableData) {
+          if (studentData === 503) {
+            winDash.webContents.send("gotError", studentData);
+          } else if (studentData === 403) {
+            winDash.webContents.send("gotError", studentData);
+          } else {
+            winDash.webContents.send("gotStudentData",studentData,timetableData);
+          }
+          eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
+        });
       });
       eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
     });
@@ -64,23 +67,93 @@ function createWindow () {
     eventEmitter.on("gotLoginDetails", function loginDetailsHandler(instituteCode,username,password) {
       getStudentData(instituteCode, username, password);
       eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData) {
-        if (studentData === 503) {
-          winDash.webContents.send("gotError", studentData);
-        } else if (studentData === 403) {
-          winDash.webContents.send("gotError", studentData);
-        } else {
-          winDash.webContents.send("gotStudentDataFirst",studentData);
-        }
-        eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
+        getTimetableData(instituteCode, username, password, studentData);
+        eventEmitter.on("timetableDownloaded", function timetableHandler(studentData, timetableData) {
+          if (studentData === 503) {
+            winDash.webContents.send("gotError", studentData);
+          } else if (studentData === 403) {
+            winDash.webContents.send("gotError", studentData);
+          } else {
+            winDash.webContents.send("gotStudentData",studentData,timetableData);
+          }
+          eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
+        });
       });
       eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
     });
   });
 }
 
+function getTimetableData(instituteCode, username, password, studentData) {
+  getAuthToken(instituteCode, username, password, studentData);
+  eventEmitter.on('authTokenDownloaded', function authDownHandler(authToken, studentData) {
+    if (authToken === 503) {
+      eventEmitter.emit("timetableDownloaded", 503);
+      return;
+    } else if (authToken === 403) {
+      eventEmitter.emit("timetableDownloaded", 403);
+      return;
+    }
 
+    StartDate = getMonday(new Date());
+    EndDate = new Date();
+    EndDate = addDays(StartDate, 6);
 
-function getAuthToken(instituteCode, username, password) {
+    console.log("/mapi/api/v1/Lesson?fromDate=" + (StartDate.getFullYear() + "-" + AddZeroToMonth(StartDate.getMonth()+1) + "-" + AddZeroToMonth(StartDate.getDate())) + "&toDate=" + (EndDate.getFullYear() + "-" + AddZeroToMonth(EndDate.getMonth()+1) + "-" + AddZeroToMonth(EndDate.getDate())));
+
+    const request = net.request({
+      method: "GET",
+      protocol: "https:",
+      hostname: instituteCode + ".e-kreta.hu",
+      path: "/mapi/api/v1/Lesson?fromDate=" + (StartDate.getFullYear() + "-" + AddZeroToMonth(StartDate.getMonth()+1) + "-" + AddZeroToMonth(StartDate.getDate())) + "&toDate=" + (EndDate.getFullYear() + "-" + AddZeroToMonth(EndDate.getMonth()+1) + "-" + AddZeroToMonth(EndDate.getDate())), 
+      headers: {
+        'Authorization': 'Bearer ' + authToken
+      }
+    });
+
+    res_string = "";
+    request.on("response", (response) => {
+      response.on('data', (chunk) => {
+        res_string += chunk;
+      });
+
+      if (studentData === undefined)
+        studentData = 0;
+
+      response.on('end', () => {
+        if (response.statusCode === 200) {
+          eventEmitter.emit("timetableDownloaded", studentData, JSON.parse(res_string));
+        } else {
+          eventEmitter.emit("timetableDownloaded", response.statusCode);
+        }
+      });
+    });
+  request.end();
+  eventEmitter.removeListener('authTokenDownloaded', authDownHandler);
+  });
+}
+
+function AddZeroToMonth(month) {
+  if (month < 10)
+    return "0" + month.toString();
+  else
+    return month;
+}
+
+function addDays(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+function getMonday(d) {
+  d = new Date(d);
+  var day = d.getDay(),
+      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+  return new Date(d.setDate(diff));
+}
+
+function getAuthToken(instituteCode, username, password, studentData) {
   post_data = "institute_code=" + instituteCode + "&userName=" + username + "&password=" + password + "&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
   const request = net.request({
     method: "POST",
@@ -100,7 +173,7 @@ function getAuthToken(instituteCode, username, password) {
     });
     response.on('end', () => {
       if (response.statusCode === 200) {
-        eventEmitter.emit("authTokenDownloaded", JSON.parse(res_string).access_token);
+        eventEmitter.emit("authTokenDownloaded", JSON.parse(res_string).access_token, studentData);
       } else {
         eventEmitter.emit("authTokenDownloaded", response.statusCode);
         return;
