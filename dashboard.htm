@@ -138,6 +138,65 @@
                         case "Dashboard": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + tab + "</h2>");
+
+                            var allEvals = 0;
+                            var evals5 = 0;
+                            var evals4 = 0;
+                            var evals3 = 0;
+                            var evals2 = 0;
+                            var evals1 = 0;
+                            var evalsText = 0;
+
+                            for(let i = 0; i < Object.keys(studentData.Evaluations).length; i++) {
+                                switch (studentData.Evaluations[i].NumberValue) {
+                                    case 5: {
+                                        evals5++;
+                                        break;
+                                    }
+                                    case 4: {
+                                        evals4++;
+                                        break;
+                                    }
+                                    case 3: {
+                                        evals3++;
+                                        break;
+                                    }
+                                    case 2: {
+                                        evals2++;
+                                        break;
+                                    }
+                                    case 1: {
+                                        evals1++;
+                                        break;
+                                    }
+                                    default: {
+                                        evalsText++;
+                                        break;
+                                    }
+                                }
+                                allEvals++;
+                            }
+
+                            var evalDiv = $("<div style='display: inline-block;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
+                            var evalH3 = $("<h3>Evaluations</h3>");
+                            var allEvalsP = $("<p>You have a total number of " + allEvals + " evaluations.</p>");
+                            var evals5P = $("<p style='color: #03a338;'>From this " + evals5 + " evaluations are 5,</p>");
+                            var evals4P = $("<p style='color: #bed300;'>" + evals4 + " evaluations are 4,</p>");
+                            var evals3P = $("<p style='color: #ed5300;'>" + evals3 + " evaluations are 3,</p>");
+                            var evals2P = $("<p style='color: #ff0202;'>" + evals2 + " evaluations are 2,</p>");
+                            var evals1P = $("<p style='color: #820000;'>and " + evals1 + " evaluations are 1.</p>");
+                            var evalsTextP = $("<p>(Also " + evalsText + " evaluations are text, diligence or deportment evaluations.)</p>");
+
+
+                            evalDiv.appendTo("#tabDiv");
+                            evalH3.appendTo("#evalDiv");
+                            allEvalsP.appendTo("#evalDiv");
+                            evals5P.appendTo("#evalDiv");
+                            evals4P.appendTo("#evalDiv");
+                            evals3P.appendTo("#evalDiv");
+                            evals2P.appendTo("#evalDiv");
+                            evals1P.appendTo("#evalDiv");
+                            evalsTextP.appendTo("#evalDiv");
                             break;
                         }
                         
