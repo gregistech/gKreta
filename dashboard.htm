@@ -111,12 +111,41 @@
                                 $("<h2 id='h2" + j + "'><b>" + subjects[j] + "</b></h2>").appendTo("#tabDiv");
                                 for (i = 0;i < Object.keys(evals).length;i++) {
                                     if (evals[i].Subject === subjects[j]) {
-                                        //$("<p>" + evals[i].Value + " | " + evals[i].Mode + " | " + evals[i].Theme + "</p>").appendTo("#tabDiv");
-                                        var currentEval = "<p>" + evals[i].Value; //evals[i].Theme !== ""
+                                        switch (evals[i].NumberValue) {
+                                            case 5: {
+                                                var evalColor = "#03a338";
+                                                break;
+                                            }
+                                            case 4: {
+                                                var evalColor = "#bed300";
+                                                break;
+                                            }
+                                            case 3: {
+                                                var evalColor = "#ed5300";
+                                                break;
+                                            }
+                                            case 2: {
+                                                var evalColor = "#ff0202";
+                                                break;
+                                            }
+                                            case 1: {
+                                                var evalColor = "#820000";
+                                                break;
+                                            }
+                                            default: {
+                                                var evalColor = "#820000";
+                                                break;
+                                            }
+                                        }
+
+                                        var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
+
                                         if (evals[i].Mode !== "" && evals[i].Mode !== null)
                                             currentEval += " | " + evals[i].Mode;
+
                                         if (evals[i].Theme !== "" && evals[i].Theme !== null)
                                             currentEval += " | " + evals[i].Theme;
+
                                         currentEval = $(currentEval + "</p>");
                                         currentEval.appendTo("#tabDiv");
                                     }

@@ -97,8 +97,6 @@ hr {
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 60px; /* Place content 60px from the top */
 }
-
-/* The navigation menu links */
 .sidenav a {
     padding: 8px 8px 8px 3px;
     text-decoration: none;
@@ -106,19 +104,31 @@ hr {
     color: #818181;
     display: block;
 }
-
-/* When you mouse over the navigation links, change their color */
 .sidenav a:hover {
     color: #f1f1f1;
 }
-
-/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
 #content {
     margin-left:100px;
 }
-
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}
 }
+
+::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+	background-color: #000000;
+}
+
