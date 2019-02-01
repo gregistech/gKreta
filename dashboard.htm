@@ -203,7 +203,7 @@
                         case "Timetable": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + tab + "</h2>");
-                            console.log("asd");
+                            console.log(timetableData);
                             var timetableTable = $("<table id='timetableTable' style='width: 100%;color: #555;border-width: 2px;border-style: solid;'><tr><th>Count</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th><th>Sunday</th></tr></table>"); //OOF VARIABLE NAME
                             timetableTable.appendTo("#tabDiv");
                             var lessonRows = new Array();
@@ -219,6 +219,7 @@
                                         dayOffset++;
                                     }
                                 }
+                                console.log("=========================");
                                 dayOffset = 0;
                             }
                             break;
