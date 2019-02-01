@@ -49,7 +49,6 @@
 
                 ipc.on("gotStudentData", function studentDataHandler(event,studentDataL, timetableDataL) {
                     studentData = studentDataL;
-                    console.log(studentData);
                     timetableData = timetableDataL;
                     $('#content').empty();
                     var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
@@ -69,7 +68,6 @@
 
                 function refreshData() {
                     ipc.send('getStudentDataAndSendToRenderer');
-                    console.log("Refreshed data!");
                 }
 
                 function capitalizeFirstLetter(string) {
@@ -305,7 +303,6 @@
                         case "Timetable": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + tab + "</h2>");
-                            console.log(timetableData);
                             var timetableTable = $("<table id='timetableTable' style='width: 100%;color: #555;border-width: 2px;border-style: solid;'><tr><th>Count</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th><th>Sunday</th></tr></table>"); //OOF VARIABLE NAME
                             timetableTable.appendTo("#tabDiv");
                             var lessonRows = new Array();
@@ -316,12 +313,11 @@
                                 $("<td>" + (i + 1) + ".</td>").appendTo("#rowTr" + i);
                                 for (j = 0; j < Object.keys(timetableData).length;j++)
                                 {   
-                                    if (timetableData[j].Count - 1 === (i) && addDays(getMonday(new Date()), dayOffset).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate() ) {
+                                    if (timetableData[j].Count === (i + 1) && addDays(getMonday(new Date()), dayOffset).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate() ) {
                                         $("<td>" + timetableData[j].Subject + "(" + timetableData[j].Count + ")</td>").appendTo("#rowTr" + i);
                                         dayOffset++;
                                     }
                                 }
-                                console.log("=========================");
                                 dayOffset = 0;
                             }
                             break;
@@ -350,7 +346,6 @@
                                 $("<h2 id='h2" + j + "'><b>" + dates[j] + "</b></h2>").appendTo("#tabDiv");
                                 for (i = 0;i < Object.keys(absences).length;i++) {
                                     if (absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T')) === dates[j]) {
-                                        console.log(absences[i].JustificationState);
                                         switch (absences[i].JustificationState) {
                                             case "BeJustified": {
                                                 var absenceColor = "#ff0202";
@@ -380,7 +375,6 @@
                         }
 
                         default: {
-                            console.log(tab, " oof default case?!!");
                             break;
                         }
                     }
