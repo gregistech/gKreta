@@ -43,10 +43,20 @@ input {
     background-color: #2a2a2a;
     padding: none;
     margin: 0px; 
-    position:absolute;
+    position: fixed;
     top:1px;
     right:1px;
     left:1px;
+}
+#title-bar-bg {
+    height: 24px; 
+    background-color: #2a2a2a;
+    padding: none;
+    margin: 0px; 
+    position: fixed;
+    top:0px;
+    right:0px;
+    left:0px;
 }
 #title {
     text-align: center;

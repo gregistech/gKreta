@@ -8,12 +8,14 @@
         <link rel="stylesheet" type="text/css" href="./css/general-dark.css" />
     </head>
     <body>
-        <div id="title-bar">
-            <div id="title"><script>document.write(document.title)</script></div>
-            <div id="title-bar-btns">
-                    <button id="min-btn" class="title-bar-btn">-</button>
-                    <button id="max-btn" class="title-bar-btn">+</button>
-                    <button id="close-btn" class="title-bar-btn">x</button>
+        <div id="title-bar-bg">
+            <div id="title-bar">
+                <div id="title"><script>document.write(document.title)</script></div>
+                <div id="title-bar-btns">
+                        <button id="min-btn" class="title-bar-btn">-</button>
+                        <button id="max-btn" class="title-bar-btn">+</button>
+                        <button id="close-btn" class="title-bar-btn">x</button>
+                </div>
             </div>
         </div>
         <div id="mySidenav" class="sidenav">
@@ -27,8 +29,10 @@
             <script>
                 var ipc=require("electron").ipcRenderer;
                 var isErrorPage = false;
+                var studentData = "";
                 ipc.send('getStudentDataAndSendToRenderer');
-                ipc.on("gotStudentData", function studentDataHandler(event,studentData) {
+                ipc.on("gotStudentData", function studentDataHandler(event,studentDataL) {
+                    studentData = studentDataL;
                     var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
                     var hr = $("<hr />")
                     var tabDiv = $("<div id='tabDiv' />")
@@ -93,6 +97,31 @@
                         case "Evaluations": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            var evals = studentData.Evaluations;   
+                            var subjects = new Array();
+
+                            for(let i = 0; i < Object.keys(evals).length; i++) {
+                                var currentSub = evals[i].Subject;
+                                if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
+                                    subjects.push(currentSub);
+                                }
+                            }
+
+                            for (j = 0;j < Object.keys(subjects).length;j++) {
+                                $("<h2 id='h2" + j + "'><b>" + subjects[j] + "</b></h2>").appendTo("#tabDiv");
+                                for (i = 0;i < Object.keys(evals).length;i++) {
+                                    if (evals[i].Subject === subjects[j]) {
+                                        //$("<p>" + evals[i].Value + " | " + evals[i].Mode + " | " + evals[i].Theme + "</p>").appendTo("#tabDiv");
+                                        var currentEval = "<p>" + evals[i].Value; //evals[i].Theme !== ""
+                                        if (evals[i].Mode !== "" && evals[i].Mode !== null)
+                                            currentEval += " | " + evals[i].Mode;
+                                        if (evals[i].Theme !== "" && evals[i].Theme !== null)
+                                            currentEval += " | " + evals[i].Theme;
+                                        currentEval = $(currentEval + "</p>");
+                                        currentEval.appendTo("#tabDiv");
+                                    }
+                                }
+                            }
                             break;
                         }
 
