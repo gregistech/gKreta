@@ -39,34 +39,9 @@
                     ipc.removeListener("gotStudentData", studentDataHandler);
                 });
 
-                ipc.on("gotError503", function errorDataHandler(event) { 
-                    var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error 503<h1/>");
-                    var hr = $("<hr />")
-                    var tabDiv = $("<div id='tabDiv' />")
-                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
-                    var errorDesc = $("<p>KRÉTA servers are under maintenance.<p/>");
-                    h1Name.appendTo('#content');
-                    hr.appendTo('#content');
-                    tabDiv.appendTo('#content');
-                    errorDescH2.appendTo('#tabDiv');
-                    errorDesc.appendTo('#tabDiv');
-                    ipc.removeListener("gotError503", errorDataHandler);
-                    isErrorPage = true;
-                });
-
-                ipc.on("gotError403", function errorDataHandler(event) { 
-                    var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error 403<h1/>");
-                    var hr = $("<hr />")
-                    var tabDiv = $("<div id='tabDiv' />")
-                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
-                    var errorDesc = $("<p>KRÉTA servers are under maintenance.<p/>");
-                    h1Name.appendTo('#content');
-                    hr.appendTo('#content');
-                    tabDiv.appendTo('#content');
-                    errorDescH2.appendTo('#tabDiv');
-                    errorDesc.appendTo('#tabDiv');
-                    ipc.removeListener("gotError403", errorDataHandler);
-                    isErrorPage = true;
+                ipc.on("gotError", function errorDataHandler(event, errorCode) {
+                    displayErrorTab(errorCode); 
+                    ipc.removeListener("gotError", errorDataHandler);
                 });
                 function onNavClick(tab) {
                     document.title = "gKréta - " + tab;
@@ -74,38 +49,74 @@
                     $('#title').html(document.title);
 
                     if (!isErrorPage) {
-                        $("#tabDiv").empty();
-                        $("#tabDiv").html("<h2>" + tab + "</h2>");
-                        switch(tab) {
-                            case "Dashboard": {
-                                console.log(tab);
-                                break;
-                            }
-                            
-                            case "Evaluations": {
-                                console.log(tab);
-                                break;
-                            }
+                        displayTab(tab);
+                    }
+                }
 
-                            case "Timetable": {
-                                console.log(tab);
-                                break;
-                            }
+                function displayErrorTab(errorCode) {
+                    var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error " + errorCode + "<h1/>");
+                    var hr = $("<hr />")
+                    var tabDiv = $("<div id='tabDiv' />")
+                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
+                    switch (errorCode) {
+                        case 403: {
+                            var errorDesc = $("<p>KRÉTA servers are under maintenance. We got an unauthorized access error.<p/>");
+                            break;
+                        }
 
-                            case "Absences": {
-                                console.log(tab);
-                                break;
-                            }
+                        case 503: {
+                            var errorDesc = $("<p>KRÉTA servers are under maintenance. In theory it's a planned maintenance.<p/>");
+                            break;
+                        }
 
-                            case "Settings": {
-                                console.log(tab);
-                                break;
-                            }
+                        default: {
+                            var errorDesc = $("<p>Unknown error. Report the error code to the developer. (thegergo02@protonmail.com or github.com/thegergo02)<p/>");
+                            break;
+                        }
+                    }
+                    h1Name.appendTo('#content');
+                    hr.appendTo('#content');
+                    tabDiv.appendTo('#content');
+                    errorDescH2.appendTo('#tabDiv');
+                    errorDesc.appendTo('#tabDiv');
+                    isErrorPage = true;
+                }
 
-                            default: {
-                                console.log(tab, " oof default case?!!");
-                                break;
-                            }
+                function displayTab(tab) {
+                    switch(tab) {
+                        case "Dashboard": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            break;
+                        }
+                        
+                        case "Evaluations": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            break;
+                        }
+
+                        case "Timetable": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            break;
+                        }
+
+                        case "Absences": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");                            
+                            break;
+                        }
+
+                        case "Settings": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");                            
+                            break;
+                        }
+
+                        default: {
+                            console.log(tab, " oof default case?!!");
+                            break;
                         }
                     }
                 }

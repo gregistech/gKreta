@@ -47,9 +47,9 @@ function createWindow () {
       getStudentData(instituteCode, username, password);
       eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData) {
         if (studentData === 503) {
-          winDash.webContents.send("gotError503", studentData);
+          winDash.webContents.send("gotError", studentData);
         } else if (studentData === 403) {
-          winDash.webContents.send("gotError403", studentData);
+          winDash.webContents.send("gotError", studentData);
         } else {
           winDash.webContents.send("gotStudentData",studentData);
         }
