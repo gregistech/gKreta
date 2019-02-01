@@ -58,7 +58,27 @@ function createWindow () {
       eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
     });
   });
+
+  ipcMain.on('getStudentDataAndSendToRendererFirst', (event) => {
+    getLoginDetails();
+    eventEmitter.on("gotLoginDetails", function loginDetailsHandler(instituteCode,username,password) {
+      getStudentData(instituteCode, username, password);
+      eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData) {
+        if (studentData === 503) {
+          winDash.webContents.send("gotError", studentData);
+        } else if (studentData === 403) {
+          winDash.webContents.send("gotError", studentData);
+        } else {
+          winDash.webContents.send("gotStudentDataFirst",studentData);
+        }
+        eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
+      });
+      eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
+    });
+  });
 }
+
+
 
 function getAuthToken(instituteCode, username, password) {
   post_data = "institute_code=" + instituteCode + "&userName=" + username + "&password=" + password + "&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";

@@ -30,28 +30,43 @@
                 var ipc=require("electron").ipcRenderer;
                 var isErrorPage = false;
                 var studentData = "";
-                ipc.send('getStudentDataAndSendToRenderer');
+                var currentTab = "Dashboard";
+                var intervalID = "";
+
+                ipc.send('getStudentDataAndSendToRendererFirst');
+                ipc.on("gotStudentDataFirst", function studentDataHandler(event,studentDataL) {
+                    studentData = studentDataL;
+                    refreshData();
+                    intervalID = setInterval(refreshData, 300000);
+                });
+
                 ipc.on("gotStudentData", function studentDataHandler(event,studentDataL) {
                     studentData = studentDataL;
+                    $('#content').empty();
                     var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
                     var hr = $("<hr />")
                     var tabDiv = $("<div id='tabDiv' />")
                     h1Name.appendTo('#content');
                     hr.appendTo('#content');
                     tabDiv.appendTo('#content');
-                    onNavClick('Dashboard')
-                    ipc.removeListener("gotStudentData", studentDataHandler);
+                    onNavClick(currentTab);
                 });
+
 
                 ipc.on("gotError", function errorDataHandler(event, errorCode) {
                     displayErrorTab(errorCode); 
-                    ipc.removeListener("gotError", errorDataHandler);
                 });
+
+                function refreshData() {
+                    ipc.send('getStudentDataAndSendToRenderer');
+                    console.log("Refreshed data!");
+                }
 
                 function capitalizeFirstLetter(string) {
                     return string.charAt(0).toUpperCase() + string.slice(1);
                 }
 
+                
                 function onNavClick(tab) {
                     document.title = "gKréta - " + tab;
                     $('#title').empty();
@@ -63,6 +78,7 @@
                 }
 
                 function displayErrorTab(errorCode) {
+                    $('body').empty();
                     var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error " + errorCode + "<h1/>");
                     var hr = $("<hr />")
                     var tabDiv = $("<div id='tabDiv' />")
@@ -92,6 +108,7 @@
                 }
 
                 function displayTab(tab) {
+                    currentTab = tab;
                     switch(tab) {
                         case "Dashboard": {
                             $("#tabDiv").empty();
@@ -162,6 +179,8 @@
                         case "Timetable": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + tab + "</h2>");
+
+
                             break;
                         }
 
