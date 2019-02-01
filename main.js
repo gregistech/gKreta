@@ -17,8 +17,6 @@ function createWindow () {
     } else if(err.code === 'ENOENT') {
       win = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
       win.loadFile("login.htm");
-    } else {
-        console.log('ERROR: ', err.code);
     }
 });
 
@@ -98,8 +96,6 @@ function getTimetableData(instituteCode, username, password, studentData) {
     StartDate = getMonday(new Date());
     EndDate = new Date();
     EndDate = addDays(StartDate, 6);
-
-    console.log("/mapi/api/v1/Lesson?fromDate=" + (StartDate.getFullYear() + "-" + AddZeroToMonth(StartDate.getMonth()+1) + "-" + AddZeroToMonth(StartDate.getDate())) + "&toDate=" + (EndDate.getFullYear() + "-" + AddZeroToMonth(EndDate.getMonth()+1) + "-" + AddZeroToMonth(EndDate.getDate())));
 
     const request = net.request({
       method: "GET",
