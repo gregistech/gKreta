@@ -47,6 +47,11 @@
                     displayErrorTab(errorCode); 
                     ipc.removeListener("gotError", errorDataHandler);
                 });
+
+                function capitalizeFirstLetter(string) {
+                    return string.charAt(0).toUpperCase() + string.slice(1);
+                }
+
                 function onNavClick(tab) {
                     document.title = "gKréta - " + tab;
                     $('#title').empty();
@@ -108,7 +113,7 @@
                             }
 
                             for (j = 0;j < Object.keys(subjects).length;j++) {
-                                $("<h2 id='h2" + j + "'><b>" + subjects[j] + "</b></h2>").appendTo("#tabDiv");
+                                $("<h2 id='h2" + j + "'><b>" + capitalizeFirstLetter(subjects[j]) + "</b></h2>").appendTo("#tabDiv");
                                 for (i = 0;i < Object.keys(evals).length;i++) {
                                     if (evals[i].Subject === subjects[j]) {
                                         switch (evals[i].NumberValue) {
