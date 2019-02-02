@@ -210,25 +210,16 @@ function getStudentData(instituteCode, username, password) {
 }
 
 function getInstitutes() {
-  const request = net.request({
-    method: "GET",
-    protocol: "https:",
-    hostname: "kretaglobalmobileapi.ekreta.hu",
-    path: "/api/v1/Institute"
-  });
-  request.setHeader("apiKey","7856d350-1fda-45f5-822d-e1a2f3f1acf0");
+  makeNetRequest("GET","https:","kretaglobalmobileapi.ekreta.hu","/api/v1/Institute", {"apiKey": "7856d350-1fda-45f5-822d-e1a2f3f1acf0"});
 
-  institutes = "";
-
-  request.on("response", (response) => {
-    response.on('data', (chunk) => {
-      institutes += chunk;
-    });
-    response.on('end', () => {
-      eventEmitter.emit("institutesDownloaded", institutes);
-    });
+  eventEmitter.on("makeNetRequestFinished",function netRequestHandler(response) {
+    eventEmitter.emit("institutesDownloaded", response);
+    eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
   });
-  request.end();
+  eventEmitter.on("makeNetRequestFinishedWithError",function netRequestHandler(response) {
+    eventEmitter.emit("institutesDownloaded", response);
+    eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
+  });
 }
 
 function saveLoginDetails(instituteCode, username, password) {
@@ -255,7 +246,7 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data) {
     protocol: protocol,
     hostname: hostname,
     path: path, 
-    headers: headers + {"Accept-Encoding": "gzip"}
+    headers: headers
   });
 
   res_string = "";
@@ -275,8 +266,6 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data) {
   });
   if (post_data !== undefined && post_data !== null)  
     request.write(post_data);
-  else
-    request.write();
   request.end();
 }
 
