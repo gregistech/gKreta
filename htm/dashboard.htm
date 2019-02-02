@@ -100,6 +100,47 @@
                     return result;
                 }
 
+                function generateDiv(divName, other_args) {
+                    switch (divName) {
+                        case "evals": {
+                            var evalDiv = $("<div style='display: inline-block;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
+                            evalDiv.appendTo("#tabDiv");
+                            var evalH3 = $("<h3>Evaluations</h3>");
+                            evalH3.appendTo("#evalDiv");
+                            var allEvalsP = $("<p>You have a total number of " + other_args[0] + " evaluations.</p>");
+                            allEvalsP.appendTo("#evalDiv");
+                            var evals5P = $("<p style='color: #03a338;'>From this " + other_args[5] + " evaluations are 5,</p>");
+                            evals5P.appendTo("#evalDiv");
+                            var evals4P = $("<p style='color: #bed300;'>" + other_args[4] + " evaluations are 4,</p>");
+                            evals4P.appendTo("#evalDiv");
+                            var evals3P = $("<p style='color: #ed5300;'>" + other_args[3] + " evaluations are 3,</p>");
+                            evals3P.appendTo("#evalDiv");
+                            var evals2P = $("<p style='color: #ff0202;'>" + other_args[2] + " evaluations are 2,</p>");
+                            evals2P.appendTo("#evalDiv");
+                            var evals1P = $("<p style='color: #820000;'>and " + other_args[1] + " evaluations are 1.</p>");
+                            evals1P.appendTo("#evalDiv");
+                            var evalsTextP = $("<p>(Also " + other_args[6] + " evaluations are text, diligence or deportment evaluations.)</p>");
+                            evalsTextP.appendTo("#evalDiv");
+                            break;
+                        }
+                        case "absences": {
+                            var absDiv = $("<div style='display: inline-block;float: right;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
+                            absDiv.appendTo("#tabDiv");
+                            var absH3 = $("<h3>Absences</h3>");
+                            absH3.appendTo("#absDiv");
+                            var allAbsP = $("<p>You were absent from a total number of " + other_args[0] + " lessons.</p>");  
+                            allAbsP.appendTo("#absDiv");
+                            var justifiedAbsP = $("<p style='color: #03a338;'>From this " + other_args[1] + " were justified,</p>");
+                            justifiedAbsP.appendTo("#absDiv");
+                            var beJustifiedAbsP = $("<p style='color: #ff0202;'>but " + other_args[2] + " needs to be justified.</p>");
+                            beJustifiedAbsP.appendTo("#absDiv");
+                            var medicalAbsP = $("<p style='color: #0290c9;'>You have " + other_args[3] + " absences justified by a doctor.</p>");
+                            medicalAbsP.appendTo("#absDiv");
+                            break;
+                        }
+                    }
+                }
+
                 function displayErrorTab(errorCode) {
                     $('body').empty();
                     var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error " + errorCode + "<h1/>");
@@ -191,52 +232,23 @@
                                 allAbsences++;
                             }
 
-                            var evalDiv = $("<div style='display: inline-block;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
-                            evalDiv.appendTo("#tabDiv");
+                            var evalsDivArray = new Array();
+                            evalsDivArray[0] = allEvals;
+                            evalsDivArray[5] = evals5;
+                            evalsDivArray[4] = evals4;
+                            evalsDivArray[3] = evals3;
+                            evalsDivArray[2] = evals2;
+                            evalsDivArray[1] = evals1;
+                            evalsDivArray[6] = evalsText;
 
-                            var evalH3 = $("<h3>Evaluations</h3>");
-                            evalH3.appendTo("#evalDiv");
+                            var absDivArray = new Array();
+                            absDivArray[0] = allAbsences;
+                            absDivArray[1] = justifiedAbsences;
+                            absDivArray[2] = beJustifiedAbsences;
+                            absDivArray[3] = medicalAbsences;
 
-                            var allEvalsP = $("<p>You have a total number of " + allEvals + " evaluations.</p>");
-                            allEvalsP.appendTo("#evalDiv");
-
-                            var evals5P = $("<p style='color: #03a338;'>From this " + evals5 + " evaluations are 5,</p>");
-                            evals5P.appendTo("#evalDiv");
-
-                            var evals4P = $("<p style='color: #bed300;'>" + evals4 + " evaluations are 4,</p>");
-                            evals4P.appendTo("#evalDiv");
-
-                            var evals3P = $("<p style='color: #ed5300;'>" + evals3 + " evaluations are 3,</p>");
-                            evals3P.appendTo("#evalDiv");
-
-                            var evals2P = $("<p style='color: #ff0202;'>" + evals2 + " evaluations are 2,</p>");
-                            evals2P.appendTo("#evalDiv");
-
-                            var evals1P = $("<p style='color: #820000;'>and " + evals1 + " evaluations are 1.</p>");
-                            evals1P.appendTo("#evalDiv");
-
-                            var evalsTextP = $("<p>(Also " + evalsText + " evaluations are text, diligence or deportment evaluations.)</p>");
-                            evalsTextP.appendTo("#evalDiv");
-                
-
-                            var absDiv = $("<div style='display: inline-block;float: right;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
-                            absDiv.appendTo("#tabDiv");
-
-                            var absH3 = $("<h3>Absences</h3>");
-                            absH3.appendTo("#absDiv");
-
-                            var allAbsP = $("<p>You were absent from a total number of " + allAbsences + " lessons.</p>");  
-                            allAbsP.appendTo("#absDiv");
-
-                            var justifiedAbsP = $("<p style='color: #03a338;'>From this " + justifiedAbsences + " were justified,</p>");
-                            justifiedAbsP.appendTo("#absDiv");
-                            
-                            var beJustifiedAbsP = $("<p style='color: #ff0202;'>but " + beJustifiedAbsences + " needs to be justified.</p>");
-                            beJustifiedAbsP.appendTo("#absDiv");
-
-                            var medicalAbsP = $("<p style='color: #0290c9;'>You have " + medicalAbsences + " absences justified by a doctor.</p>");
-                            medicalAbsP.appendTo("#absDiv");
-
+                            generateDiv("evals", evalsDivArray);
+                            generateDiv("absences", absDivArray);
                             break;
                         }
                         

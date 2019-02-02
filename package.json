@@ -1,6 +1,6 @@
 {
   "name": "gkreta",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "It's an application for displaying your informations from the KRÉTA systems. (Written in Electron)",
   "main": "main.js",
   "scripts": {
