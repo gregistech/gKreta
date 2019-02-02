@@ -101,38 +101,32 @@ function getTimetableData(instituteCode, username, password, studentData) {
     }
 
     StartDate = getMonday(new Date());
-    EndDate = new Date();
     EndDate = addDays(StartDate, 6);
 
-    const request = net.request({
-      method: "GET",
-      protocol: "https:",
-      hostname: instituteCode + ".e-kreta.hu",
-      path: "/mapi/api/v1/Lesson?fromDate=" + (StartDate.getFullYear() + "-" + AddZeroToMonth(StartDate.getMonth()+1) + "-" + AddZeroToMonth(StartDate.getDate())) + "&toDate=" + (EndDate.getFullYear() + "-" + AddZeroToMonth(EndDate.getMonth()+1) + "-" + AddZeroToMonth(EndDate.getDate())), 
-      headers: {
-        'Authorization': 'Bearer ' + authToken
-      }
+    var startYear = StartDate.getFullYear();
+    var startMonth = AddZeroToMonth(StartDate.getMonth()+1);
+    var startDay = AddZeroToMonth(StartDate.getDate());
+
+    var endYear = EndDate.getFullYear();
+    var endMonth = AddZeroToMonth(EndDate.getMonth()+1);
+    var endDay = AddZeroToMonth(EndDate.getDate());
+
+    var dateString = "/mapi/api/v1/Lesson?fromDate=" + startYear + "-" + startMonth + "-" + startDay + "&toDate=" + endYear + "-" + endMonth + "-" + endDay;
+
+    if (studentData === undefined)
+    studentData = 0;
+
+    makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu",dateString,{'Authorization': 'Bearer ' + authToken},null,studentData);
+
+    eventEmitter.on("makeNetRequestFinished",function netRequestHandler(response, other_args) {
+      eventEmitter.emit("timetableDownloaded", other_args, JSON.parse(response));
+      eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
     });
-
-    res_string = "";
-    request.on("response", (response) => {
-      response.on('data', (chunk) => {
-        res_string += chunk;
-      });
-
-      if (studentData === undefined)
-        studentData = 0;
-
-      response.on('end', () => {
-        if (response.statusCode === 200) {
-          eventEmitter.emit("timetableDownloaded", studentData, JSON.parse(res_string));
-        } else {
-          eventEmitter.emit("timetableDownloaded", response.statusCode);
-        }
-      });
+    eventEmitter.on("makeNetRequestFinishedWithError",function netRequestHandler(response) {
+      eventEmitter.emit("timetableDownloaded", response);
+      eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
     });
-  request.end();
-  eventEmitter.removeListener('authTokenDownloaded', authDownHandler);
+    eventEmitter.removeListener('authTokenDownloaded', authDownHandler);
   });
 }
 
