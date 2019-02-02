@@ -11,16 +11,8 @@ var dirConf = "conf/";
 var dirHtm = "htm/"
 
 function startApplication () {
-  if (!fs.existsSync(dirConf))
-    fs.mkdirSync(dirConf);
-
-  fs.stat('./conf/logindetails.json', function(err, stat) {
-    if(err == null) {
-      winDash = createWindow("dashboard.htm");
-    } else if(err.code === 'ENOENT') {
-      win = createWindow("login.htm");
-    }
-});
+  createConfDir();
+  loadCorrectWindowAtStart();
 
   ipcMain.on('getInstitutesAndSendToRenderer', (event)=> { 
     getInstitutes();
@@ -81,6 +73,21 @@ function startApplication () {
       eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
     });
   });
+}
+
+function loadCorrectWindowAtStart() {
+  fs.stat('./conf/logindetails.json', function(err, stat) {
+    if(err == null) {
+      winDash = createWindow("dashboard.htm");
+    } else if(err.code === 'ENOENT') {
+      win = createWindow("login.htm");
+    }
+  });
+}
+
+function createConfDir() {
+  if (!fs.existsSync(dirConf))
+    fs.mkdirSync(dirConf);
 }
 
 function createWindow(htmFile) {
