@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>gKréta - Dashboard</title>
+        <script>window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");</script>
+        <script>require("../modules/titlebar.js");</script>
+        <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
+    </head>
+    <body>
+        <div id="title-bar-bg">
+            <div id="title-bar">
+                <div id="title"><script>document.write(document.title)</script></div>
+                <div id="title-bar-btns">
+                        <button id="min-btn" class="title-bar-btn">-</button>
+                        <button id="max-btn" class="title-bar-btn">+</button>
+                        <button id="close-btn" class="title-bar-btn">x</button>
+                </div>
+            </div>
+        </div>
+        <div id="mySidenav" class="sidenav">
+                <a onclick="onNavClick('Dashboard')">Dashboard</a>
+                <a onclick="onNavClick('Evaluations')">Evaluations</a>
+                <a onclick="onNavClick('Timetable')">Timetable</a>
+                <a onclick="onNavClick('Absences')">Absences</a>
+                <a onclick="onNavClick('Settings')">Settings</a>
+        </div>
+        <div id="content">  
+            <script>
+                var ipc=require("electron").ipcRenderer;
+                var isErrorPage = false;
+                var loading = true;
+
+                var studentData = "";
+                var timetableData = "";
+
+                var currentTab = "Dashboard";
+
+                var intervalID = "";
+
+                ipc.send('getStudentDataAndSendToRendererFirst');
+                ipc.on("gotStudentDataFirst", function studentDataHandler(event,studentDataL) {
+                    studentData = studentDataL;
+                    timetableData = timetableDataL;
+                    refreshData();
+                    intervalID = setInterval(refreshData, 300000);
+                    loading = false;
+                });
+
+                ipc.on("gotStudentData", function studentDataHandler(event,studentDataL, timetableDataL) {
+                    studentData = studentDataL;
+                    timetableData = timetableDataL;
+                    $('#content').empty();
+                    var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
+                    var hr = $("<hr />")
+                    var tabDiv = $("<div id='tabDiv' />")
+                    h1Name.appendTo('#content');
+                    hr.appendTo('#content');
+                    tabDiv.appendTo('#content');
+                    displayTab(currentTab);
+                    loading = false;
+                });
+
+
+                ipc.on("gotError", function errorDataHandler(event, errorCode) {
+                    displayErrorTab(errorCode); 
+                });
+
+                function refreshData() {
+                    ipc.send('getStudentDataAndSendToRenderer');
+                }
+
+                function capitalizeFirstLetter(string) {
+                    return string.charAt(0).toUpperCase() + string.slice(1);
+                }
+
+                
+                function onNavClick(tab) {
+                    if (!loading) {
+                        document.title = "gKréta - " + tab;
+                        $('#title').empty();
+                        $('#title').html(document.title);
+
+                        if (!isErrorPage) {
+                            displayTab(tab);
+                        }
+                    }
+                }
+
+                function getMonday(d) {
+                    d = new Date(d);
+                    var day = d.getDay(),
+                        diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+                    return new Date(d.setDate(diff));
+                }
+
+                function addDays(date, days) {
+                    var result = new Date(date);
+                    result.setDate(result.getDate() + days);
+                    return result;
+                }
+
+                function displayErrorTab(errorCode) {
+                    $('body').empty();
+                    var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error " + errorCode + "<h1/>");
+                    var hr = $("<hr />")
+                    var tabDiv = $("<div id='tabDiv' />")
+                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
+                    switch (errorCode) {
+                        case 403: {
+                            var errorDesc = $("<p>KRÉTA servers are under maintenance. We got an unauthorized access error.<p/>");
+                            break;
+                        }
+
+                        case 503: {
+                            var errorDesc = $("<p>KRÉTA servers are under maintenance. In theory it's a planned maintenance.<p/>");
+                            break;
+                        }
+
+                        default: {
+                            var errorDesc = $("<p>Unknown error. Report the error code to the developer. (thegergo02@protonmail.com or github.com/thegergo02)<p/>");
+                            break;
+                        }
+                    }
+                    h1Name.appendTo('#content');
+                    hr.appendTo('#content');
+                    tabDiv.appendTo('#content');
+                    errorDescH2.appendTo('#tabDiv');
+                    errorDesc.appendTo('#tabDiv');
+                    isErrorPage = true;
+                }
+
+                function displayTab(tab) {
+                    currentTab = tab;
+                    switch(tab) {
+                        case "Dashboard": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+
+                            var allEvals = 0;
+                            var evals5 = 0;
+                            var evals4 = 0;
+                            var evals3 = 0;
+                            var evals2 = 0;
+                            var evals1 = 0;
+                            var evalsText = 0;
+                            
+                            for(let i = 0; i < Object.keys(studentData.Evaluations).length; i++) {
+                                switch (studentData.Evaluations[i].NumberValue) {
+                                    case 5: {
+                                        evals5++;
+                                        break;
+                                    }
+                                    case 4: {
+                                        evals4++;
+                                        break;
+                                    }
+                                    case 3: {
+                                        evals3++;
+                                        break;
+                                    }
+                                    case 2: {
+                                        evals2++;
+                                        break;
+                                    }
+                                    case 1: {
+                                        evals1++;
+                                        break;
+                                    }
+                                    default: {
+                                        evalsText++;
+                                        break;
+                                    }
+                                }
+                                allEvals++;
+                            }
+
+                            var allAbsences = 0;
+                            var justifiedAbsences = 0;
+                            var beJustifiedAbsences = 0;
+                            var medicalAbsences = 0;
+                            for (i = 0; i < Object.keys(studentData.Absences).length; i++) {
+                                if (studentData.Absences[i].JustificationState === "Justified")
+                                {
+                                    justifiedAbsences++;
+                                } else if (studentData.Absences[i].JustificationState === "BeJustified") {
+                                    beJustifiedAbsences++;
+                                }
+                                if (studentData.Absences[i].JustificationType === "Medical")
+                                    medicalAbsences++;
+                                allAbsences++;
+                            }
+
+                            var evalDiv = $("<div style='display: inline-block;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
+                            evalDiv.appendTo("#tabDiv");
+
+                            var evalH3 = $("<h3>Evaluations</h3>");
+                            evalH3.appendTo("#evalDiv");
+
+                            var allEvalsP = $("<p>You have a total number of " + allEvals + " evaluations.</p>");
+                            allEvalsP.appendTo("#evalDiv");
+
+                            var evals5P = $("<p style='color: #03a338;'>From this " + evals5 + " evaluations are 5,</p>");
+                            evals5P.appendTo("#evalDiv");
+
+                            var evals4P = $("<p style='color: #bed300;'>" + evals4 + " evaluations are 4,</p>");
+                            evals4P.appendTo("#evalDiv");
+
+                            var evals3P = $("<p style='color: #ed5300;'>" + evals3 + " evaluations are 3,</p>");
+                            evals3P.appendTo("#evalDiv");
+
+                            var evals2P = $("<p style='color: #ff0202;'>" + evals2 + " evaluations are 2,</p>");
+                            evals2P.appendTo("#evalDiv");
+
+                            var evals1P = $("<p style='color: #820000;'>and " + evals1 + " evaluations are 1.</p>");
+                            evals1P.appendTo("#evalDiv");
+
+                            var evalsTextP = $("<p>(Also " + evalsText + " evaluations are text, diligence or deportment evaluations.)</p>");
+                            evalsTextP.appendTo("#evalDiv");
+                
+
+                            var absDiv = $("<div style='display: inline-block;float: right;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
+                            absDiv.appendTo("#tabDiv");
+
+                            var absH3 = $("<h3>Absences</h3>");
+                            absH3.appendTo("#absDiv");
+
+                            var allAbsP = $("<p>You were absent from a total number of " + allAbsences + " lessons.</p>");  
+                            allAbsP.appendTo("#absDiv");
+
+                            var justifiedAbsP = $("<p style='color: #03a338;'>From this " + justifiedAbsences + " were justified,</p>");
+                            justifiedAbsP.appendTo("#absDiv");
+                            
+                            var beJustifiedAbsP = $("<p style='color: #ff0202;'>but " + beJustifiedAbsences + " needs to be justified.</p>");
+                            beJustifiedAbsP.appendTo("#absDiv");
+
+                            var medicalAbsP = $("<p style='color: #0290c9;'>You have " + medicalAbsences + " absences justified by a doctor.</p>");
+                            medicalAbsP.appendTo("#absDiv");
+
+                            break;
+                        }
+                        
+                        case "Evaluations": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            var evals = studentData.Evaluations;   
+                            var subjects = new Array();
+
+                            for(let i = 0; i < Object.keys(evals).length; i++) {
+                                var currentSub = evals[i].Subject;
+                                if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
+                                    subjects.push(currentSub);
+                                }
+                            }
+
+                            for (j = 0;j < Object.keys(subjects).length;j++) {
+                                $("<h2 id='h2" + j + "'><b>" + capitalizeFirstLetter(subjects[j]) + "</b></h2>").appendTo("#tabDiv");
+                                for (i = 0;i < Object.keys(evals).length;i++) {
+                                    if (evals[i].Subject === subjects[j]) {
+                                        switch (evals[i].NumberValue) {
+                                            case 5: {
+                                                var evalColor = "#03a338";
+                                                break;
+                                            }
+                                            case 4: {
+                                                var evalColor = "#bed300";
+                                                break;
+                                            }
+                                            case 3: {
+                                                var evalColor = "#ed5300";
+                                                break;
+                                            }
+                                            case 2: {
+                                                var evalColor = "#ff0202";
+                                                break;
+                                            }
+                                            case 1: {
+                                                var evalColor = "#820000";
+                                                break;
+                                            }
+                                            default: {
+                                                var evalColor = "#820000";
+                                                break;
+                                            }
+                                        }
+
+                                        var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
+
+                                        if (evals[i].Mode !== "" && evals[i].Mode !== null)
+                                            currentEval += " | " + evals[i].Mode;
+
+                                        if (evals[i].Theme !== "" && evals[i].Theme !== null)
+                                            currentEval += " | " + evals[i].Theme;
+
+                                        currentEval = $(currentEval + "</p>");
+                                        currentEval.appendTo("#tabDiv");
+                                    }
+                                }
+                            }
+                            break;
+                        }
+
+                        case "Timetable": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            var timetableTable = $("<table id='timetableTable' style='width: 100%;color: #555;border-width: 2px;border-style: solid;'><tr><th>Count</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th><th>Sunday</th></tr></table>"); //OOF VARIABLE NAME
+                            timetableTable.appendTo("#tabDiv");
+                            var lessonRows = new Array();
+                            var dayOffset = 0;
+
+                            var monday = new Array();
+                            var tuesday = new Array();
+                            var wednesday = new Array();
+                            var thursday = new Array();
+                            var friday = new Array();
+                            var saturday = new Array();
+                            var sunday = new Array();
+
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (getMonday(new Date()).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    monday[timetableData[j].Count] = timetableData[j].Subject;
+                                }
+                            }
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (addDays(getMonday(new Date()), 1).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    tuesday[timetableData[j].Count] = timetableData[j].Subject; 
+                                }
+                            }
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (addDays(getMonday(new Date()), 2).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    wednesday[timetableData[j].Count] = timetableData[j].Subject; 
+                                }
+                            }
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (addDays(getMonday(new Date()), 3).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    thursday[timetableData[j].Count] = timetableData[j].Subject; 
+                                }
+                            }
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (addDays(getMonday(new Date()), 4).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    friday[timetableData[j].Count] = timetableData[j].Subject; 
+                                }
+                            }
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (addDays(getMonday(new Date()), 5).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    saturday[timetableData[j].Count] = timetableData[j].Subject; 
+                                }
+                            }
+                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                if (addDays(getMonday(new Date()), 6).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
+                                    sunday[timetableData[j].Count] = timetableData[j].Subject; 
+                                }
+                            }
+
+
+                            for (i = 0; i < 10;i++) {
+                                lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
+                                lessonRows[i].appendTo("#timetableTable");
+                                $("<td>" + (i + 1) + ".</td>").appendTo("#rowTr" + i);
+
+                                if (monday[i+1] !== undefined)
+                                    $("<td>" + monday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i); 
+
+                                if (tuesday[i+1] !== undefined)
+                                    $("<td>" + tuesday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i); 
+
+                                if (wednesday[i+1] !== undefined)
+                                    $("<td>" + wednesday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i); 
+
+                                if (thursday[i+1] !== undefined)    
+                                    $("<td>" + thursday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i);
+
+                                if (friday[i+1] !== undefined)       
+                                    $("<td>" + friday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i);
+
+                                if (saturday[i+1] !== undefined) 
+                                    $("<td>" + saturday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i);
+
+                                if (sunday[i+1] !== undefined) 
+                                    $("<td>" + sunday[i+1] + "</td>").appendTo("#rowTr" + i);
+                                else
+                                    $("<td>---</td>").appendTo("#rowTr" + i);
+
+                            }
+                            break;
+                        }
+
+                        case "Absences": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            var absences = studentData.Absences;   
+                            var dates = new Array();
+
+                            for(let i = 0; i < Object.keys(absences).length; i++) {
+                                var currentDate = absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T'));
+                                if (dates.indexOf(currentDate) === -1 && currentDate !== null) {
+                                    dates.push(currentDate);
+                                }
+                            }
+
+                            dates.sort(function(a, b) {
+                                a = new Date(a);
+                                b = new Date(b);
+                                return a>b ? -1 : a<b ? 1 : 0;
+                            });
+
+                            for (j = 0;j < Object.keys(dates).length;j++) {
+                                $("<h2 id='h2" + j + "'><b>" + dates[j] + "</b></h2>").appendTo("#tabDiv");
+                                for (i = 0;i < Object.keys(absences).length;i++) {
+                                    if (absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T')) === dates[j]) {
+                                        switch (absences[i].JustificationState) {
+                                            case "BeJustified": {
+                                                var absenceColor = "#ff0202";
+                                                break;
+                                            }
+                                            case "Justified": {
+                                                var absenceColor = "#03a338";
+                                                break;
+                                            }
+                                            default: {
+                                                var absenceColor = "#ff0202";
+                                                break;
+                                            }
+                                        }
+                                        var currentAbsence = $("<p style='color: " + absenceColor +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
+                                        currentAbsence.appendTo("#tabDiv"); 
+                                    } 
+                                }
+                            }                          
+                            break;
+                        }
+
+                        case "Settings": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + tab + "</h2>");                            
+                            break;
+                        }
+
+                        default: {
+                            break;
+                        }
+                    }
+                }
+            </script>
+        </div>
+    </body>
+</html>

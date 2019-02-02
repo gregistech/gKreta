@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>gKréta - Login to the KRÉTA systems</title>
+    <script>window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");</script>
+    <script>require("../modules/titlebar.js");</script>
+    <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
+    <style>
+      select {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 30px;
+      }
+      input {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="title-bar">
+          <div id="title"><script>document.write(document.title)</script></div>
+          <div id="title-bar-btns">
+               <button id="min-btn" class="title-bar-btn">-</button>
+               <button id="max-btn" class="title-bar-btn">+</button>
+               <button id="close-btn" class="title-bar-btn">x</button>
+          </div>
+    </div>
+    <div id="content">  
+      <script>
+        var ipc=require("electron").ipcRenderer;
+        ipc.send('getInstitutesAndSendToRenderer');
+
+        var institutes = "";
+        ipc.on("gotInstitutes",(event, institutesL) => {
+          institutes = JSON.parse(institutesL);
+          var cities = new Array();
+          var instituteCode = "";
+          var username = "";
+          var password = "";
+
+          for(let i = 0; i < Object.keys(institutes).length; i++) {
+              var currentCity = institutes[i].City;
+              if (cities.indexOf(currentCity) === -1 && currentCity !== null) {
+                  cities.push(currentCity);
+              }
+          }
+          cities.sort();
+
+          var sCities = $('<select id="sCities" onchange="CitySelected()"/>');
+          var sCitiesDefOption = $('<option value="" disabled selected>Select your city</option>');
+          sCitiesDefOption.appendTo(sCities);
+          for (i = 0;i < Object.keys(cities).length;i++) {
+            $('<option />', {value: cities[i], text: cities[i]}).appendTo(sCities);
+          }
+          sCities.appendTo('#content');
+        });
+
+        function CitySelected() {
+          $('#sInstitutes').remove();
+          $('.sInstitutesBreaks').remove();
+          $('#tbUsername').remove();
+          $('.tbUsernameBreaks').remove();
+          $('#tbPassword').remove();
+          $('.tbPasswordBreaks').remove();
+
+          var sInstitutesBreaks = $('<br class="sInstitutesBreaks"/>');
+          var sInstitutes = $('<select id="sInstitutes" onchange="InstituteSelected()"/>');
+          var sInstDefOption = $('<option value="" disabled selected>Select your institute</option>');
+          sInstDefOption.appendTo(sInstitutes);
+
+          for (i = 0;i < Object.keys(institutes).length;i++) {
+            if (institutes[i].City === $('#sCities').val()) {
+              $('<option />', {value: institutes[i].InstituteCode, text: institutes[i].Name.substring(0,100)}).appendTo(sInstitutes);
+            }
+          }
+          sInstitutesBreaks.appendTo('#content');
+          sInstitutes.appendTo('#content');
+        }
+
+        function InstituteSelected() {
+          instituteCode = $('#sInstitutes').val();
+
+          $('#tbUsername').remove();
+          $('.tbUsernameBreaks').remove();
+          $('#tbPassword').remove();
+          $('.tbPasswordBreaks').remove();
+
+          var tbUsernameBreaks = $('<br class="tbUsernameBreaks"/>');
+          var tbUsername = $('<input type="text" id="tbUsername" placeholder="Username..." onchange="UsernameSelected()"/>');
+
+          tbUsernameBreaks.appendTo('#content');
+          tbUsername.appendTo('#content');
+        }
+
+        function UsernameSelected() {
+          username = $('#tbUsername').val();
+
+          $('#tbPassword').remove();
+          $('.tbPasswordBreaks').remove();
+
+          var tbPasswordBreaks = $('<br class="tbPasswordBreaks"/>');
+          var tbPassword = $('<input type="password" id="tbPassword" placeholder="Password..." onchange="PasswordSelected()"/>');
+
+          tbPasswordBreaks.appendTo('#content');
+          tbPassword.appendTo('#content');
+        }
+
+        function PasswordSelected() {
+          password = $('#tbPassword').val();
+          
+          ipc.send('getStudentDataAndRegisterThenSendToRenderer', instituteCode, username, password);
+        }
+      </script>
+    </div>
+  </body>
+</html>
