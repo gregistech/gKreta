@@ -25,6 +25,7 @@ function startApplication () {
 
   ipcMain.on('getStudentDataAndRegisterThenSendToRenderer', (event, instituteCode, username, password) => {
     getStudentData(instituteCode, username, password);
+    saveSettings();
     eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData, instituteCode, username, password) {
       saveLoginDetails(instituteCode, username, password);
       winDash = createWindow("dashboard.htm");
@@ -73,6 +74,11 @@ function startApplication () {
       });
       eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
     });
+  });
+
+  ipcMain.on("saveSettings", (event,settingsJson) => {
+    saveSettings(settingsJson);
+    winDash.reload();
   });
 }
 
@@ -262,6 +268,23 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data, ot
   if (post_data !== undefined && post_data !== null)  
     request.write(post_data);
   request.end();
+}
+
+function saveSettings(settingsJson) {
+  if (settingsJson === null || settingsJson === undefined || settingsJson === "")
+    settingsJson = {"locale" : "en"};
+
+  fs.writeFile('./conf/settings.json', JSON.stringify(settingsJson), function (err) {
+    if (err) throw err;
+  });
+  eventEmitter.emit("savedSettings");
+}
+
+function getSettings() {
+  fs.readFile("./conf/settings.json", "utf8", (err, data) => {
+    if (err) saveSettings();
+    eventEmitter.emit("gotSettings",JSON.parse(data));
+   });
 }
 
 app.on('ready', startApplication);

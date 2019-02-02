@@ -30,7 +30,7 @@
         "but": "de",
         "need_justify": "igazolatlan" ,       
         "you_have": "Neked",   
-        "justified_by_doctor": "igazolást orvos igazolt.",   
+        "justified_by_doctor": "igazolást orvos igazolt",   
 
         "count": "Óraszám",   
         "monday": "Hétfő",   
@@ -39,6 +39,11 @@
         "thursday": "Csütörtök",   
         "friday": "Péntek",   
         "saturday": "Szombat",   
-        "sunday": "Vasárnap"   
+        "sunday": "Vasárnap",
+        
+        "language": "Nyelv",
+        "en": "Angol",
+        "hu": "Magyar",
+        "save_settings": "Beállítások mentése"
     }
 }

@@ -5,7 +5,8 @@
         <script>
         window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
         require("../modules/titlebar.js");
-        var locale = require("../locales/en.json")["dashboard.htm"];
+        var settings = require("../conf/settings.json");
+        var locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
         </script>
         <title>gKréta - <script>document.write(locale["dashboard"])</script></title>
         <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
@@ -294,7 +295,12 @@
                     isErrorPage = true;
                 }
 
-                function saveSettings() {};
+                function saveSettings() {
+                    var settingsJson = {
+                        "locale" : $("#sLocale").val()
+                    }
+                    ipc.send("saveSettings", settingsJson);
+                };
 
                 function displayTab(tab) {
                     currentTab = tab;
@@ -493,14 +499,33 @@
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["settings"] + "</h2>");
 
-                            var pLocale = $("<p>Language: </p>");
+                            var languageSelected = new Array();
+                            switch (settings["locale"]) {
+                                case "en": {
+                                    languageSelected[0] = " selected ";
+                                    languageSelected[1] = "";
+                                    break;
+                                }
+                                case "hu": {
+                                    languageSelected[0] = "";
+                                    languageSelected[1] = " selected ";
+                                    break;
+                                }
+                            }
+
+                            var pLocale = $("<p>" + locale["language"] + ": </p>");
                             pLocale.appendTo("#tabDiv");
-                            var sLocale = $('<select id="sLocale" onchange="saveSettings()"/>');
+                            var sLocale = $('<select id="sLocale"/>');
                             sLocale.appendTo("#tabDiv");
-                            var sLocaleEn = $('<option value="en">English</option>');
+                            var sLocaleEn = $('<option value="en"' + languageSelected[0] + '>' + locale["en"] + '</option>');
                             sLocaleEn.appendTo("#sLocale");
-                            var sLocaleHu = $('<option value="hu">Hungarian</option>');
+                            var sLocaleHu = $('<option value="hu"' + languageSelected[1] + '>' + locale["hu"] + '</option>');
                             sLocaleHu.appendTo("#sLocale");
+
+                            $("<br />").appendTo("#tabDiv");
+
+                            var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
+                            bSaveSettings.appendTo("#tabDiv");
                             break;
                         }
 

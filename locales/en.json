@@ -39,6 +39,11 @@
         "thursday": "Thursday",   
         "friday": "Friday",   
         "saturday": "Saturday",   
-        "sunday": "Sunday"   
+        "sunday": "Sunday",
+        
+        "language": "Language",
+        "en": "English",
+        "hu": "Hungarian",
+        "save_settings": "Save settings"
     }
 }
