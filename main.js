@@ -7,8 +7,8 @@ var eventEmitter = new events.EventEmitter();
 var winDash = "";
 var win = "";
 
-var dirConf = "conf/";
-var dirHtm = "htm/"
+var dirConf = "./conf/";
+var dirHtm = "./htm/"
 
 function startApplication () {
   eventEmitter.setMaxListeners(Infinity);
@@ -274,14 +274,14 @@ function saveSettings(settingsJson) {
   if (settingsJson === null || settingsJson === undefined || settingsJson === "")
     settingsJson = {"locale" : "en"};
 
-  fs.writeFile('./conf/settings.json', JSON.stringify(settingsJson), function (err) {
+  fs.writeFile(dirConf + '/settings.json', JSON.stringify(settingsJson), function (err) {
     if (err) throw err;
   });
   eventEmitter.emit("savedSettings");
 }
 
 function getSettings() {
-  fs.readFile("./conf/settings.json", "utf8", (err, data) => {
+  fs.readFile(dirConf + "/settings.json", "utf8", (err, data) => {
     if (err) saveSettings();
     eventEmitter.emit("gotSettings",JSON.parse(data));
    });
