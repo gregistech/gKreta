@@ -4,19 +4,21 @@ var fs = require('fs');
 
 var eventEmitter = new events.EventEmitter();
 
-function createWindow () {
-  var dirConf = "conf/";
-  if (!fs.existsSync(dirConf)){
+var winDash = "";
+var win = "";
+
+var dirConf = "conf/";
+var dirHtm = "htm/"
+
+function startApplication () {
+  if (!fs.existsSync(dirConf))
     fs.mkdirSync(dirConf);
-  }
 
   fs.stat('./conf/logindetails.json', function(err, stat) {
     if(err == null) {
-      winDash = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
-      winDash.loadFile("dashboard.htm");
+      winDash = createWindow("dashboard.htm");
     } else if(err.code === 'ENOENT') {
-      win = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
-      win.loadFile("login.htm");
+      win = createWindow("login.htm");
     }
 });
 
@@ -32,8 +34,7 @@ function createWindow () {
     getStudentData(instituteCode, username, password);
     eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData, instituteCode, username, password) {
       saveLoginDetails(instituteCode, username, password);
-      winDash = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
-      winDash.loadFile("dashboard.htm");
+      winDash = createWindow("dashboard.htm");
       win.close();
       eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
     });
@@ -80,6 +81,12 @@ function createWindow () {
       eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
     });
   });
+}
+
+function createWindow(htmFile) {
+  winL = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
+  winL.loadFile(dirHtm + htmFile);
+  return winL;
 }
 
 function getTimetableData(instituteCode, username, password, studentData) {
@@ -258,4 +265,4 @@ function getLoginDetails() {
    });
 }
 
-app.on('ready', createWindow);
+app.on('ready', startApplication);
