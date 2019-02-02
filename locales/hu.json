@@ -1,0 +1,44 @@
+{
+    "login.htm" : {
+        "login_title": "Bejelentkezés a KRÉTÁ-ba",
+        "select_city": "Válaszd ki a városod...",
+        "select_institute" : "Válaszd ki az intézményed...",
+        "username" : "Felhasználónév...",
+        "password" : "Jelszó..."
+    },
+
+    "dashboard.htm" : {
+        "error_faq_title": "Ez mit jelent?",
+        "error_faq_403": "A KRÉTA szerverek karbantartás alatt vannak. Nem kaptunk engedélyt a belépésre.",
+        "error_faq_503": "A KRÉTA szerverek karbantartás alatt vannak. Elvileg ez egy tervezett karbantartás.",
+        "error_faq_unk": "Ismeretlen hiba. Szólj a fejlesztőnek! (thegergo02@protonmail.com vagy github.com/thegergo02)",
+
+        "dashboard": "Irányítópult",
+        "evals": "Jegyek",
+        "timetable": "Órarend",
+        "absences": "Hiányzások",
+        "settings": "Beállítások",
+
+        "total_number_of": "Összesen",
+        "evaluations": "jegyed van",
+        "from_this": "Ebből",
+        "evals_are": "jegy",
+        "and": "és",
+        "text_evals_info": "jegy szöveges, magatartás/szorgalom jegy.",
+        "lowercase_abs": "hiányzásod van",        
+        "w_justified": "igazolva van",        
+        "but": "de",
+        "need_justify": "igazolatlan" ,       
+        "you_have": "Neked",   
+        "justified_by_doctor": "igazolást orvos igazolt.",   
+
+        "count": "Óraszám",   
+        "monday": "Hétfő",   
+        "tuesday": "Kedd",   
+        "wednesday": "Szerda",   
+        "thursday": "Csütörtök",   
+        "friday": "Péntek",   
+        "saturday": "Szombat",   
+        "sunday": "Vasárnap"   
+    }
+}
