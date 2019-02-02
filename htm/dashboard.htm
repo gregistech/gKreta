@@ -2,9 +2,12 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>gKréta - Dashboard</title>
-        <script>window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");</script>
-        <script>require("../modules/titlebar.js");</script>
+        <script>
+        window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
+        require("../modules/titlebar.js");
+        var locale = require("../locales/en.json")["dashboard.htm"];
+        </script>
+        <title>gKréta - <script>document.write(locale["dashboard"])</script></title>
         <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
     </head>
     <body>
@@ -19,15 +22,16 @@
             </div>
         </div>
         <div id="mySidenav" class="sidenav">
-                <a onclick="onNavClick('Dashboard')">Dashboard</a>
-                <a onclick="onNavClick('Evaluations')">Evaluations</a>
-                <a onclick="onNavClick('Timetable')">Timetable</a>
-                <a onclick="onNavClick('Absences')">Absences</a>
-                <a onclick="onNavClick('Settings')">Settings</a>
+                <a onclick="onNavClick('Dashboard')"><script>document.write(locale["dashboard"])</script></a>
+                <a onclick="onNavClick('Evaluations')"><script>document.write(locale["evals"])</script></a>
+                <a onclick="onNavClick('Timetable')"><script>document.write(locale["timetable"])</script></a>
+                <a onclick="onNavClick('Absences')"><script>document.write(locale["absences"])</script></a>
+                <a onclick="onNavClick('Settings')"><script>document.write(locale["settings"])</script></a>
         </div>
         <div id="content">  
             <script>
-                var ipc=require("electron").ipcRenderer;
+                var ipc = require("electron").ipcRenderer;
+
                 var isErrorPage = false;
                 var loading = true;
 
@@ -73,11 +77,34 @@
                 function capitalizeFirstLetter(string) {
                     return string.charAt(0).toUpperCase() + string.slice(1);
                 }
-
-                
+               
                 function onNavClick(tab) {
                     if (!loading) {
-                        document.title = "gKréta - " + tab;
+                        var tabLocalized = "";
+                        switch(tab) {
+                            case "Dashboard": {
+                                tabLocalized = locale["dashboard"];
+                                break;
+                            }
+                            case "Evaluations": {
+                                tabLocalized = locale["evals"];
+                                break;
+                            }
+                            case "Timetable": {
+                                tabLocalized = locale["timetable"];
+                                break;
+                            }
+                            case "Absences": {
+                                tabLocalized = locale["absences"];
+                                break;
+                            }
+                            case "Settings": {
+                                tabLocalized = locale["settings"];
+                                break;
+                            }
+                        }
+
+                        document.title = "gKréta - " + tabLocalized;
                         $('#title').empty();
                         $('#title').html(document.title);
 
@@ -108,21 +135,21 @@
                         case "evals": {
                             var evalDiv = $("<div style='display: inline-block;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
                             evalDiv.appendTo("#tabDiv");
-                            var evalH3 = $("<h3>Evaluations</h3>");
+                            var evalH3 = $("<h3>" + locale["evals"] + "</h3>");
                             evalH3.appendTo("#evalDiv");
-                            var allEvalsP = $("<p>You have a total number of " + other_args[0] + " evaluations.</p>");
+                            var allEvalsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["evaluations"] +".</p>");
                             allEvalsP.appendTo("#evalDiv");
-                            var evals5P = $("<p style='color: #03a338;'>From this " + other_args[5] + " evaluations are 5,</p>");
+                            var evals5P = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[5] + " " + locale["evals_are"] + " 5,</p>");
                             evals5P.appendTo("#evalDiv");
-                            var evals4P = $("<p style='color: #bed300;'>" + other_args[4] + " evaluations are 4,</p>");
+                            var evals4P = $("<p style='color: #bed300;'>" + other_args[4] + " " + locale["evals_are"] + " 4,</p>");
                             evals4P.appendTo("#evalDiv");
-                            var evals3P = $("<p style='color: #ed5300;'>" + other_args[3] + " evaluations are 3,</p>");
+                            var evals3P = $("<p style='color: #ed5300;'>" + other_args[3] + " " + locale["evals_are"] + " 3,</p>");
                             evals3P.appendTo("#evalDiv");
-                            var evals2P = $("<p style='color: #ff0202;'>" + other_args[2] + " evaluations are 2,</p>");
+                            var evals2P = $("<p style='color: #ff0202;'>" + other_args[2] + " " + locale["evals_are"] + " 2,</p>");
                             evals2P.appendTo("#evalDiv");
-                            var evals1P = $("<p style='color: #820000;'>and " + other_args[1] + " evaluations are 1.</p>");
+                            var evals1P = $("<p style='color: #820000;'>" + locale["and"] + " " + other_args[1] + " " + locale["evals_are"] + " 1.</p>");
                             evals1P.appendTo("#evalDiv");
-                            var evalsTextP = $("<p>(Also " + other_args[6] + " evaluations are text, diligence or deportment evaluations.)</p>");
+                            var evalsTextP = $("<p>" + other_args[6] + " " + locale["text_evals_info"] + "</p>");
                             evalsTextP.appendTo("#evalDiv");
                             break;
                         }
@@ -131,18 +158,18 @@
                             absDiv.appendTo("#tabDiv");
                             var absH3 = $("<h3>Absences</h3>");
                             absH3.appendTo("#absDiv");
-                            var allAbsP = $("<p>You were absent from a total number of " + other_args[0] + " lessons.</p>");  
+                            var allAbsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["lowercase_abs"] + ".</p>");  
                             allAbsP.appendTo("#absDiv");
-                            var justifiedAbsP = $("<p style='color: #03a338;'>From this " + other_args[1] + " were justified,</p>");
+                            var justifiedAbsP = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[1] + " " + locale["w_justified"] + ",</p>");
                             justifiedAbsP.appendTo("#absDiv");
-                            var beJustifiedAbsP = $("<p style='color: #ff0202;'>but " + other_args[2] + " needs to be justified.</p>");
+                            var beJustifiedAbsP = $("<p style='color: #ff0202;'>" + locale["but"] + " " + other_args[2] + " " + locale["need_justify"] +".</p>");
                             beJustifiedAbsP.appendTo("#absDiv");
-                            var medicalAbsP = $("<p style='color: #0290c9;'>You have " + other_args[3] + " absences justified by a doctor.</p>");
+                            var medicalAbsP = $("<p style='color: #0290c9;'>" + locale["you_have"] + " " + other_args[3] + " " + locale["justified_by_doctor"] +".</p>");
                             medicalAbsP.appendTo("#absDiv");
                             break;
                         }
                         case "timetable": {
-                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>Count</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th><th>Sunday</th></tr></table>"); //OOF VARIABLE NAME
+                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th>" + locale["monday"] + "</th><th>" + locale["tuesday"] + "</th><th>" + locale["wednesday"] + "</th><th>" + locale["thursday"] + "</th><th>" + locale["friday"] + "</th><th>" + locale["saturday"] + "</th><th>" + locale["sunday"] + "</th></tr></table>"); //OOF VARIABLE NAME
                             timetableTable.appendTo("#tabDiv");
                             var lessonRows = new Array();
                             var dayOffset = 0;
@@ -242,20 +269,20 @@
                     var h1Name = $("<h1 style='margin-top: 30px; color: #a30404;'>Error " + errorCode + "<h1/>");
                     var hr = $("<hr />")
                     var tabDiv = $("<div id='tabDiv' />")
-                    var errorDescH2 = $("<h2>What does this mean?<h2/>");
+                    var errorDescH2 = $("<h2>" + locale["error_faq_title"] + "<h2/>");
                     switch (errorCode) {
                         case 403: {
-                            var errorDesc = $("<p>KRÉTA servers are under maintenance. We got an unauthorized access error.<p/>");
+                            var errorDesc = $("<p>" + locale["error_faq_403"] + "<p/>");
                             break;
                         }
 
                         case 503: {
-                            var errorDesc = $("<p>KRÉTA servers are under maintenance. In theory it's a planned maintenance.<p/>");
+                            var errorDesc = $("<p>" + locale["error_faq_503"] + "<p/>");
                             break;
                         }
 
                         default: {
-                            var errorDesc = $("<p>Unknown error. Report the error code to the developer. (thegergo02@protonmail.com or github.com/thegergo02)<p/>");
+                            var errorDesc = $("<p>" + locale["error_faq_unk"] + "<p/>");
                             break;
                         }
                     }
@@ -272,7 +299,7 @@
                     switch(tab) {
                         case "Dashboard": {
                             $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            $("#tabDiv").html("<h2>" + locale["dashboard"] + "</h2>");
 
                             var allEvals = 0;
                             var evals5 = 0;
@@ -350,7 +377,7 @@
                         
                         case "Evaluations": {
                             $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            $("#tabDiv").html("<h2>" + locale["evals"] + "</h2>");
                             var evals = studentData.Evaluations;   
                             var subjects = new Array();
 
@@ -417,7 +444,7 @@
 
                         case "Absences": {
                             $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + tab + "</h2>");
+                            $("#tabDiv").html("<h2>" + locale["absences"] + "</h2>");
                             var absences = studentData.Absences;   
                             var dates = new Array();
 
@@ -462,7 +489,7 @@
 
                         case "Settings": {
                             $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + tab + "</h2>");                            
+                            $("#tabDiv").html("<h2>" + locale["settings"] + "</h2>");                            
                             break;
                         }
 

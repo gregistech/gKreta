@@ -1,0 +1,44 @@
+{
+    "login.htm" : {
+        "login_title": "Login to the KRÉTA systems",
+        "select_city": "Select your city...",
+        "select_institute" : "Select your institute...",
+        "username" : "Username...",
+        "password" : "Password..."
+    },
+
+    "dashboard.htm" : {
+        "error_faq_title": "What does this mean?",
+        "error_faq_403": "KRÉTA servers are under maintenance. We got an unauthorized access error.",
+        "error_faq_503": "KRÉTA servers are under maintenance. In theory it's a planned maintenance.",
+        "error_faq_unk": "Unknown error. Report the error code to the developer. (thegergo02@protonmail.com or github.com/thegergo02)",
+
+        "dashboard": "Dashboard",
+        "evals": "Evaluations",
+        "timetable": "Timetable",
+        "absences": "Absences",
+        "settings": "Settings",
+
+        "total_number_of": "You have a total number of",
+        "evaluations": "evaluations",
+        "from_this": "From this",
+        "evals_are": "evaluations are",
+        "and": "and",
+        "text_evals_info": "evaluations are text, diligence or deportment evaluations.",
+        "lowercase_abs": "absences",        
+        "w_justified": "were justified",        
+        "but": "but",
+        "need_justify": "needs to be justified" ,       
+        "you_have": "You have",   
+        "justified_by_doctor": "absences justified by a doctor",   
+
+        "count": "Count",   
+        "monday": "Monday",   
+        "tuesday": "Tuesday",   
+        "wednesday": "Wednesday",   
+        "thursday": "Thursday",   
+        "friday": "Friday",   
+        "saturday": "Saturday",   
+        "sunday": "Sunday"   
+    }
+}
