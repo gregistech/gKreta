@@ -132,6 +132,9 @@ hr {
     background-color: #000000;
 }
 
-td {
+table, td, tr, th {
     text-align: center;
+    color: #555;
+    border-width: 2px;
+    border-style: solid;
 }
