@@ -294,6 +294,8 @@
                     isErrorPage = true;
                 }
 
+                function saveSettings() {};
+
                 function displayTab(tab) {
                     currentTab = tab;
                     switch(tab) {
@@ -490,6 +492,15 @@
                         case "Settings": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["settings"] + "</h2>");
+
+                            var pLocale = $("<p>Language: </p>");
+                            pLocale.appendTo("#tabDiv");
+                            var sLocale = $('<select id="sLocale" onchange="saveSettings()"/>');
+                            sLocale.appendTo("#tabDiv");
+                            var sLocaleEn = $('<option value="en">English</option>');
+                            sLocaleEn.appendTo("#sLocale");
+                            var sLocaleHu = $('<option value="hu">Hungarian</option>');
+                            sLocaleHu.appendTo("#sLocale");
                             break;
                         }
 
