@@ -158,33 +158,17 @@ function getMonday(d) {
 
 function getAuthToken(instituteCode, username, password, studentData) {
   post_data = "institute_code=" + instituteCode + "&userName=" + username + "&password=" + password + "&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
-  const request = net.request({
-    method: "POST",
-    protocol: "https:",
-    hostname: instituteCode + ".e-kreta.hu",
-    path: "/idp/api/v1/Token", 
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': Buffer.byteLength(post_data)
-  }
+  makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(post_data)}, post_data);
+  
+  eventEmitter.on("makeNetRequestFinished", function netRequestHandler(response) {
+    eventEmitter.emit("authTokenDownloaded", JSON.parse(response).access_token, studentData);
+    eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
   });
 
-  res_string = "";
-  request.on("response", (response) => {
-    response.on('data', (chunk) => {
-      res_string += chunk;
-    });
-    response.on('end', () => {
-      if (response.statusCode === 200) {
-        eventEmitter.emit("authTokenDownloaded", JSON.parse(res_string).access_token, studentData);
-      } else {
-        eventEmitter.emit("authTokenDownloaded", response.statusCode);
-        return;
-      }
-    });
+  eventEmitter.on("makeNetRequestFinishedWithError", function netRequestHandler(response){
+    eventEmitter.emit("authTokenDownloaded", response);
+    eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
   });
-  request.write(post_data);
-  request.end();
 }
 
 function getStudentData(instituteCode, username, password) {
@@ -263,6 +247,37 @@ function getLoginDetails() {
     if (err) throw err;
     eventEmitter.emit("gotLoginDetails",JSON.parse(data).instituteCode,JSON.parse(data).username,JSON.parse(data).password);
    });
+}
+
+function makeNetRequest(method, protocol, hostname, path, headers, post_data) {
+  const request = net.request({
+    method: method,
+    protocol: protocol,
+    hostname: hostname,
+    path: path, 
+    headers: headers + {"Accept-Encoding": "gzip"}
+  });
+
+  res_string = "";
+  request.on("response", (response) => {
+    response.on('data', (chunk) => {
+      res_string += chunk;
+    });
+    response.on('end', () => {
+      if (response.statusCode === 200) {
+        eventEmitter.emit("makeNetRequestFinished", res_string);
+        return;
+      } else {
+        eventEmitter.emit("makeNetRequestFinishedWithError", response.statusCode);
+        return;
+      }
+    });
+  });
+  if (post_data !== undefined && post_data !== null)  
+    request.write(post_data);
+  else
+    request.write();
+  request.end();
 }
 
 app.on('ready', startApplication);
