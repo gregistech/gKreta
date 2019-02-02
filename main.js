@@ -11,6 +11,7 @@ var dirConf = "conf/";
 var dirHtm = "htm/"
 
 function startApplication () {
+  eventEmitter.setMaxListeners(20);
   createConfDir();
   loadCorrectWindowAtStart();
 
