@@ -181,30 +181,23 @@ function getStudentData(instituteCode, username, password) {
       eventEmitter.emit("studentDataDownloaded", 403);
       return;
     }
+    var other_args = new Array();
+    other_args[0] = instituteCode;
+    other_args[1] = username;
+    other_args[2] = password;
+    makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu","/mapi/api/v1/Student",{ "Authorization": "Bearer " + authToken},null,other_args);
 
-    const request = net.request({
-      method: "GET",
-      protocol: "https:",
-      hostname: instituteCode + ".e-kreta.hu",
-      path: "/mapi/api/v1/Student", 
-      headers: {
-        'Authorization': 'Bearer ' + authToken
-      }
+    eventEmitter.on("makeNetRequestFinished", function netRequestHandler(response, other_args) {
+      eventEmitter.emit("studentDataDownloaded", JSON.parse(response), other_args[0], other_args[1], other_args[2]);
+      eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
+      return;
     });
 
-    res_string = "";
-    request.on("response", (response) => {
-      response.on('data', (chunk) => {
-        res_string += chunk;
-      });
-      response.on('end', () => {
-        if (response.statusCode === 200) 
-          eventEmitter.emit("studentDataDownloaded", JSON.parse(res_string), instituteCode, username, password);
-        else
-          eventEmitter.emit("studentDataDownloaded", response.statusCode);
-      });
+    eventEmitter.on("makeNetRequestFinishedWithError", function netRequestHandler(response) {
+      eventEmitter.emit("studentDataDownloaded", response);
+      eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
+      return;
     });
-    request.end();
     eventEmitter.removeListener('authTokenDownloaded', authDownHandler);
   });
 }
@@ -240,7 +233,7 @@ function getLoginDetails() {
    });
 }
 
-function makeNetRequest(method, protocol, hostname, path, headers, post_data) {
+function makeNetRequest(method, protocol, hostname, path, headers, post_data, other_args) {
   const request = net.request({
     method: method,
     protocol: protocol,
@@ -256,10 +249,10 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data) {
     });
     response.on('end', () => {
       if (response.statusCode === 200) {
-        eventEmitter.emit("makeNetRequestFinished", res_string);
+        eventEmitter.emit("makeNetRequestFinished", res_string, other_args);
         return;
       } else {
-        eventEmitter.emit("makeNetRequestFinishedWithError", response.statusCode);
+        eventEmitter.emit("makeNetRequestFinishedWithError", response.statusCode, other_args);
         return;
       }
     });
