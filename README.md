@@ -33,12 +33,3 @@ cd gKreta
 npm install
 npm start
 ```
-## Build the project
-(You need to get electron-packager)
-(You need to be in the repository's root directory)
-### Linux:
-`electron-packager ./ --platform=linux --arch=x64`
-### Windows:
-`electron-packager ./ --platform=win32 --arch=x64`
-### Mac:
-**NOT SUPPORTED**
