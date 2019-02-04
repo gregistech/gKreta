@@ -1,4 +1,4 @@
-const { app, BrowserWindow, net, ipcMain } = require("electron");
+const { app, BrowserWindow, net, ipcMain, shell } = require("electron");
 var events = require('events');
 var fs = require('fs');
 
@@ -79,6 +79,10 @@ function startApplication () {
   ipcMain.on("saveSettings", (event,settingsJson) => {
     saveSettings(settingsJson);
     winDash.reload();
+  });
+
+  ipcMain.on("openExternalLink", (event, link) => {
+    shell.openExternal(link);
   });
 }
 

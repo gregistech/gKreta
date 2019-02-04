@@ -365,6 +365,10 @@
                     ipc.send("saveSettings", settingsJson);
                 };
 
+                function openExternalLink(link) {
+                    ipc.send("openExternalLink", link);
+                }
+
                 function displayTab(tab) {
                     currentTab = tab;
                     switch(tab) {
@@ -604,6 +608,9 @@
 
                             var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
                             bSaveSettings.appendTo("#tabDiv");
+
+                            var linkToIcons8 = $("<br /><br /><a style='color: #555;' href='#' onclick='openExternalLink(\"https://icons8.com\")'>Icons by Icons8</a>");
+                            linkToIcons8.appendTo("#tabDiv");
                             break;
                         }
 
