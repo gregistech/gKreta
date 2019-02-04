@@ -7,7 +7,7 @@
     "start": "electron ."
   },
   "author": "thegergo02",
-  "license": "ISC",
+  "license": "GPL-3",
   "devDependencies": {
     "electron": "^4.0.3"
   }
