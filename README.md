@@ -23,8 +23,8 @@ Based on Electron, this is a replacement for KRÉTA's web interface.
 * In the timetable, switching between weeks.
 * ...and much more!
 
-### Current latest release:
-0.2.1
+### Current latest stable release:
+Work in progress
 
 ## Setup the project
 ```
