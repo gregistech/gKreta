@@ -40,3 +40,5 @@ npm start
 | [thegergo02](https://github.com/thegergo02) | Project Maintainer |
 | [boapps](https://github.com/boapps) | Without [e-kreta-api-docs](https://github.com/boapps/e-kreta-api-docs), I couldn't start this project. |
 | [icons8](https://icons8.com) | Provided free icons (for example window control icons) |
+
+This software is not affiliated with [KRÉTA](https://www.ekreta.hu/) or with [Max & Future Kft.](http://www.max.hu/hu/) 
