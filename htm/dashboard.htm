@@ -170,7 +170,71 @@
                             break;
                         }
                         case "timetable": {
-                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th>" + locale["monday"] + "</th><th>" + locale["tuesday"] + "</th><th>" + locale["wednesday"] + "</th><th>" + locale["thursday"] + "</th><th>" + locale["friday"] + "</th><th>" + locale["saturday"] + "</th><th>" + locale["sunday"] + "</th></tr></table>"); //OOF VARIABLE NAME
+                            var mondayBold = new Array();
+                            mondayBold[0] = "";
+                            mondayBold[1] = "";
+                            var tuesdayBold = new Array();
+                            tuesdayBold[0] = "";
+                            tuesdayBold[1] = "";
+                            var wednesdayBold = new Array();
+                            wednesdayBold[0] = "";
+                            wednesdayBold[1] = "";
+                            var thursdayBold = new Array();
+                            thursdayBold[0] = "";
+                            thursdayBold[1] = "";
+                            var fridayBold = new Array();
+                            fridayBold[0] = "";
+                            fridayBold[1] = "";
+                            var saturdayBold = new Array();
+                            saturdayBold[0] = "";
+                            saturdayBold[1] = "";
+                            var sundayBold = new Array();
+                            sundayBold[0] = "";
+                            sundayBold[1] = "";
+                            var currentDay = new Date().getDay();
+                            var currentDayStyle = new Array();
+                            currentDayStyle[0] = "<span style='color: #ff0202;'>"; 
+                            currentDayStyle[1] = "</span>"; 
+
+                            switch (currentDay) {
+                                case 0: {
+                                    sundayBold[0] = currentDayStyle[0];
+                                    sundayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                                case 1: {
+                                    mondayBold[0] = currentDayStyle[0];
+                                    mondayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                                case 2: {
+                                    tuesdayBold[0] = currentDayStyle[0];
+                                    tuesdayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                                case 3: {
+                                    wednesdayBold[0] = currentDayStyle[0];
+                                    wednesdayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                                case 4: {
+                                    thursdayBold[0] = currentDayStyle[0];
+                                    thursdayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                                case 5: {
+                                    fridayBold[0] = currentDayStyle[0];
+                                    fridayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                                case 6: {
+                                    saturdayBold[0] = currentDayStyle[0];
+                                    saturdayBold[1] = currentDayStyle[1];
+                                    break;
+                                }
+                            }
+
+                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th>"+ mondayBold[0] + locale["monday"] + mondayBold[1] +"</th><th>"+ tuesdayBold[0] + locale["tuesday"] + tuesdayBold[1] +"</th><th>"+ wednesdayBold[0] + locale["wednesday"] + wednesdayBold[1] +"</th><th>"+ thursdayBold[0] + locale["thursday"] + thursdayBold[1] +"</th><th>"+ fridayBold[0] + locale["friday"] + fridayBold[1] +"</th><th>"+ saturdayBold[0] + locale["saturday"] + saturdayBold[1] +"</th><th>"+ sundayBold[0] + locale["sunday"] + sundayBold[1] +"</th></tr></table>"); //OOF VARIABLE NAME
                             timetableTable.appendTo("#tabDiv");
                             var lessonRows = new Array();
                             var dayOffset = 0;
@@ -218,7 +282,6 @@
                                     sunday[timetableData[j].Count] = timetableData[j].Subject; 
                                 }
                             }
-
 
                             for (i = 0; i < 10;i++) {
                                 lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
@@ -441,7 +504,7 @@
                                         } else if (evals[i].Type === "HalfYear") {
                                             if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
                                                 currentEval += " | " + evals[i].TypeName;
-                                                
+
                                             currentEval = $(currentEval + "</p>");
                                             currentEval.appendTo("#tabDiv");
                                         }
