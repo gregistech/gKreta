@@ -122,7 +122,7 @@ hr {
 }
 ::-webkit-scrollbar
 {
-	width: 6px;
+	width: 12px;
     background-color: #2a2a2a;
 }
 ::-webkit-scrollbar-thumb
