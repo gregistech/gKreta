@@ -33,3 +33,9 @@ cd gKreta
 npm install
 npm start
 ```
+
+## Contributors
+| Name | Contribution |
+| ------------- | ------------- |
+| [thegergo02](https://github.com/thegergo02) | Project Maintainer |
+| [boapps](https://github.com/boapps) | Without [e-kreta-api-docs](https://github.com/boapps/e-kreta-api-docs), I couldn't start this project. |
