@@ -499,6 +499,13 @@
                                             if (evals[i].Theme !== "" && evals[i].Theme !== null)
                                                 currentEval += " | " + evals[i].Theme;
 
+                                            if (evals[i].Weight !== "" && evals[i].Weight !== null && evals[i].Weight !== "100%") {
+                                                if (evals[i].Weight === "200%")
+                                                    currentEval += " | <span style='color: #ff0202;'>" + evals[i].Weight + "</span>";
+                                                else 
+                                                    currentEval += " | <span style='color: #0290c9;'>" + evals[i].Weight + "</span>";
+                                            }
+                                    
                                             currentEval = $(currentEval + "</p>");
                                             currentEval.appendTo("#tabDiv");
                                         } else if (evals[i].Type === "HalfYear") {
