@@ -1,7 +1,7 @@
 # gKreta
 Based on Electron, this is a replacement for KRÉTA's web interface.
 
-## Currently supported platforms:
+## Currently supported platforms
 * Windows (x64) (you can build the x86 libraries)
 * Linux (x64) (you can build the x86 libraries)
 
@@ -23,7 +23,7 @@ Based on Electron, this is a replacement for KRÉTA's web interface.
 * In the timetable, switching between weeks.
 * ...and much more!
 
-### Current latest stable release:
+### Current latest stable release
 Work in progress
 
 ## Setup the project
