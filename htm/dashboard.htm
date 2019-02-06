@@ -170,158 +170,70 @@
                             break;
                         }
                         case "timetable": {
-                            var mondayBold = new Array();
-                            mondayBold[0] = "";
-                            mondayBold[1] = "";
-                            var tuesdayBold = new Array();
-                            tuesdayBold[0] = "";
-                            tuesdayBold[1] = "";
-                            var wednesdayBold = new Array();
-                            wednesdayBold[0] = "";
-                            wednesdayBold[1] = "";
-                            var thursdayBold = new Array();
-                            thursdayBold[0] = "";
-                            thursdayBold[1] = "";
-                            var fridayBold = new Array();
-                            fridayBold[0] = "";
-                            fridayBold[1] = "";
-                            var saturdayBold = new Array();
-                            saturdayBold[0] = "";
-                            saturdayBold[1] = "";
-                            var sundayBold = new Array();
-                            sundayBold[0] = "";
-                            sundayBold[1] = "";
-                            var currentDay = new Date().getDay();
-                            var currentDayStyle = new Array();
-                            currentDayStyle[0] = "<span style='color: #ff0202;'>"; 
-                            currentDayStyle[1] = "</span>"; 
+                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
+                            timetableTable.appendTo("#tabDiv");
 
+                            var lessonRows = new Array();
+
+                            var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
+                            var daysOffset = 0;
+                            var currentMonday = getMonday(new Date());
+                            for (i = 0; i < 7;i++) {
+                                var currentDay = addDays(currentMonday, daysOffset)
+                                for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                    var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
+                                    if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
+                                        daysAndLessons[i][timetableData[j].Count] = timetableData[j].Subject;
+                                    }
+                                }
+                                daysOffset++;
+                            }
+
+                            var currentDay = new Date().getDay();
                             switch (currentDay) {
                                 case 0: {
-                                    sundayBold[0] = currentDayStyle[0];
-                                    sundayBold[1] = currentDayStyle[1];
+                                    $("#sunday").css("color", "#ff0202");
                                     break;
                                 }
                                 case 1: {
-                                    mondayBold[0] = currentDayStyle[0];
-                                    mondayBold[1] = currentDayStyle[1];
+                                    $("#monday").css("color", "#ff0202");
                                     break;
                                 }
                                 case 2: {
-                                    tuesdayBold[0] = currentDayStyle[0];
-                                    tuesdayBold[1] = currentDayStyle[1];
+                                    $("#tuesday").css("color", "#ff0202");
                                     break;
                                 }
                                 case 3: {
-                                    wednesdayBold[0] = currentDayStyle[0];
-                                    wednesdayBold[1] = currentDayStyle[1];
+                                    $("#wednesday").css("color", "#ff0202");
                                     break;
                                 }
                                 case 4: {
-                                    thursdayBold[0] = currentDayStyle[0];
-                                    thursdayBold[1] = currentDayStyle[1];
+                                    $("#thursday").css("color", "#ff0202");
                                     break;
                                 }
                                 case 5: {
-                                    fridayBold[0] = currentDayStyle[0];
-                                    fridayBold[1] = currentDayStyle[1];
+                                    $("#friday").css("color", "#ff0202");
                                     break;
                                 }
                                 case 6: {
-                                    saturdayBold[0] = currentDayStyle[0];
-                                    saturdayBold[1] = currentDayStyle[1];
+                                    $("#saturday").css("color", "#ff0202");
                                     break;
-                                }
-                            }
-
-                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th>"+ mondayBold[0] + locale["monday"] + mondayBold[1] +"</th><th>"+ tuesdayBold[0] + locale["tuesday"] + tuesdayBold[1] +"</th><th>"+ wednesdayBold[0] + locale["wednesday"] + wednesdayBold[1] +"</th><th>"+ thursdayBold[0] + locale["thursday"] + thursdayBold[1] +"</th><th>"+ fridayBold[0] + locale["friday"] + fridayBold[1] +"</th><th>"+ saturdayBold[0] + locale["saturday"] + saturdayBold[1] +"</th><th>"+ sundayBold[0] + locale["sunday"] + sundayBold[1] +"</th></tr></table>"); //OOF VARIABLE NAME
-                            timetableTable.appendTo("#tabDiv");
-                            var lessonRows = new Array();
-                            var dayOffset = 0;
-
-                            var monday = new Array();
-                            var tuesday = new Array();
-                            var wednesday = new Array();
-                            var thursday = new Array();
-                            var friday = new Array();
-                            var saturday = new Array();
-                            var sunday = new Array();
-
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (getMonday(new Date()).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    monday[timetableData[j].Count] = timetableData[j].Subject;
-                                }
-                            }
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (addDays(getMonday(new Date()), 1).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    tuesday[timetableData[j].Count] = timetableData[j].Subject; 
-                                }
-                            }
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (addDays(getMonday(new Date()), 2).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    wednesday[timetableData[j].Count] = timetableData[j].Subject; 
-                                }
-                            }
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (addDays(getMonday(new Date()), 3).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    thursday[timetableData[j].Count] = timetableData[j].Subject; 
-                                }
-                            }
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (addDays(getMonday(new Date()), 4).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    friday[timetableData[j].Count] = timetableData[j].Subject; 
-                                }
-                            }
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (addDays(getMonday(new Date()), 5).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    saturday[timetableData[j].Count] = timetableData[j].Subject; 
-                                }
-                            }
-                            for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                if (addDays(getMonday(new Date()), 6).getDate() === new Date(timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))).getDate()) {
-                                    sunday[timetableData[j].Count] = timetableData[j].Subject; 
                                 }
                             }
 
                             for (i = 0; i < 10;i++) {
                                 lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
                                 lessonRows[i].appendTo("#timetableTable");
+
                                 $("<td>" + (i + 1) + ".</td>").appendTo("#rowTr" + i);
-
-                                if (monday[i+1] !== undefined)
-                                    $("<td>" + monday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i); 
-
-                                if (tuesday[i+1] !== undefined)
-                                    $("<td>" + tuesday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i); 
-
-                                if (wednesday[i+1] !== undefined)
-                                    $("<td>" + wednesday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i); 
-
-                                if (thursday[i+1] !== undefined)    
-                                    $("<td>" + thursday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i);
-
-                                if (friday[i+1] !== undefined)       
-                                    $("<td>" + friday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i);
-
-                                if (saturday[i+1] !== undefined) 
-                                    $("<td>" + saturday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i);
-
-                                if (sunday[i+1] !== undefined) 
-                                    $("<td>" + sunday[i+1] + "</td>").appendTo("#rowTr" + i);
-                                else
-                                    $("<td>---</td>").appendTo("#rowTr" + i);
+                                
+                                for (j = 0; j < 7; j++) {
+                                    var currentLesson = daysAndLessons[j][i+1];
+                                    if (currentLesson === undefined)
+                                        $("<td> --- </td>").appendTo("#rowTr" + i);
+                                    else
+                                        $("<td>" + currentLesson + "</td>").appendTo("#rowTr" + i);
+                                }
                             }
                         }
                         break;
