@@ -18,6 +18,7 @@ Based on Electron, this is a replacement for KRÉTA's web interface.
 
 ## Planned functions
 * Display teacher notes.
+* Display next lesson in dashboard.
 * Create notes for yourself.
 * Homeworks (Both student and teacher homeworks.)
 * Refreshing data by auth token.
