@@ -16,16 +16,6 @@ Based on Electron, this is a replacement for KRÉTA's web interface.
 * A settings panel.
 * Two languages: English and Hungarian. (Again, in the future I add more.)
 
-## Planned functions
-* Display teacher notes.
-* Display next lesson in dashboard.
-* Create notes for yourself.
-* Homeworks (Both student and teacher homeworks.)
-* Refreshing data by auth token.
-* In the timetable, switching between weeks.
-* Export and print out half year notifier page (or export to JSON,XML...).
-* ...and much more!
-
 ### Current latest stable release
 Work in progress
 
