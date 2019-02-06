@@ -2,8 +2,9 @@
 Based on Electron, this is a replacement for KRÉTA's web interface.
 
 ## Currently supported platforms
-* Windows (x64) (you can build the x86 libraries)
-* Linux (x64) (you can build the x86 libraries)
+* Windows
+* Linux
+* Mac
 
 ## Functions
 * You can easily select your school. (No need for that klik********* code.)
