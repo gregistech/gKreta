@@ -224,9 +224,8 @@
                             for (i = 0; i < 10;i++) {
                                 lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
                                 lessonRows[i].appendTo("#timetableTable");
-
                                 $("<td>" + (i + 1) + ".</td>").appendTo("#rowTr" + i);
-                                
+
                                 for (j = 0; j < 7; j++) {
                                     var currentLesson = daysAndLessons[j][i+1];
                                     if (currentLesson === undefined)
