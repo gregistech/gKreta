@@ -21,6 +21,7 @@ Based on Electron, this is a replacement for KRÉTA's web interface.
 * Homeworks (Both student and teacher homeworks.)
 * Refreshing data by auth token.
 * In the timetable, switching between weeks.
+* Export and print out half year notifier page (or export to JSON,XML...).
 * ...and much more!
 
 ### Current latest stable release
