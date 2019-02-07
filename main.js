@@ -29,6 +29,10 @@ function startApplication () {
     eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData, instituteCode, username, password) {
       saveLoginDetails(instituteCode, username, password);
       winDash = createWindow("dashboard.htm");
+      winDash.on("closed", () => {
+        winL = null;
+        app.quit();
+      });
       win.close();
       eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
     });
@@ -104,10 +108,6 @@ function createConfDir() {
 function createWindow(htmFile) {
   winL = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
   winL.loadFile(dirHtm + htmFile);
-  winL.on("closed", () => {
-    winL = null;
-    app.quit();
-  });
   return winL;
 }
 
