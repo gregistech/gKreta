@@ -44,6 +44,8 @@
         "language": "Nyelv",
         "en": "Angol",
         "hu": "Magyar",
+        "yes": "Yes",
+        "no": "No",
         "save_settings": "Beállítások mentése"
     }
 }

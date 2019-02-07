@@ -44,6 +44,8 @@
         "language": "Language",
         "en": "English",
         "hu": "Hungarian",
+        "yes": "Yes",
+        "no": "No",
         "save_settings": "Save settings"
     }
 }

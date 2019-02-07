@@ -9,6 +9,7 @@
   "author": "thegergo02",
   "license": "GPL-3.0",
   "devDependencies": {
-    "electron": "^4.0.3"
+    "electron": "^4.0.4",
+    "cryptojslib": "^3.1.2"
   }
 }
