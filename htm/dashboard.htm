@@ -8,7 +8,7 @@
         var settings = require("../conf/settings.json");
         var locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
         </script>
-        <title>gKréta - <script>document.write(locale["dashboard"])</script></title>
+        <script>document.title = "gKréta - " + locale["dashboard"]</script>
         <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
     </head>
     <body>
