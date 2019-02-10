@@ -1,6 +1,7 @@
 const { app, BrowserWindow, net, ipcMain, shell } = require("electron");
-var events = require('events');
-var fs = require('fs');
+const events = require('events');
+const fs = require('fs');
+const keytar = require('keytar');
 
 var eventEmitter = new events.EventEmitter();
 
@@ -12,6 +13,12 @@ var dirHtm = "./htm/"
 
 var studentData = "";
 var timetableData = "";
+
+var globalInstituteCode2 = "";
+
+var globalInstituteCode = "";
+var globalAuthToken = "";
+var globalRefreshToken = "";
 
 function startApplication () {
   eventEmitter.setMaxListeners(Infinity);
@@ -37,7 +44,7 @@ function startApplication () {
   ipcMain.on("registerStudent", (event, instituteCode, username, password) => {
     saveSettings();
     getAuthToken(instituteCode, username, password);
-    globalInstituteCode = instituteCode;
+    globalInstituteCode2 = instituteCode;
     eventEmitter.once("getAuthTokenSuccess", ( authToken, instituteCode, refreshToken) => {
       saveLoginDetails(instituteCode, authToken, refreshToken);
       eventEmitter.once("saveLoginDetailsSuccess", () => {
@@ -72,13 +79,19 @@ function startApplication () {
 }
 
 function loadCorrectWindowAtStart() {
-  fs.stat('./conf/logindetails.json', function(err, stat) {
-    if(err == null) {
-      winDash = createWindow("dashboard.htm");
-    } else if(err.code === 'ENOENT') {
+  var getInstituteCodePromise = keytar.getPassword("gkreta","instituteCode");
+  getInstituteCodePromise.then(
+    (result) => {
+      if (result !== null && result !== undefined && result !== "") {
+        winDash = createWindow("dashboard.htm");
+      } else {
+        win = createWindow("login.htm");
+      }
+    },
+    (err) => {
       win = createWindow("login.htm");
     }
-  });
+  );
 }
 
 function createConfDir() {
@@ -146,9 +159,10 @@ function getMonday(d) {
 function getAuthToken(instituteCode, username, password) {
   if (instituteCode === undefined || instituteCode === null) {
     getLoginDetails();
-    eventEmitter.once("getLoginDetailsSuccess", (authToken, instituteCode, refreshToken) => {
+    eventEmitter.once("getLoginDetailsSuccess", (instituteCode, authToken, refreshToken) => {
       eventEmitter.emit("getAuthTokenSuccess", authToken, instituteCode, refreshToken);
     });
+
   } else {
     postData = "institute_code=" + instituteCode + "&userName=" + username + "&password=" + password + "&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
     makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
@@ -190,22 +204,56 @@ function getInstitutes() {
 }
 
 function saveLoginDetails(instituteCode, authToken, refreshToken) {
-  var loginDetails = {
-    "instituteCode": instituteCode,
-    "authToken": authToken,
-    "refreshToken": refreshToken 
-  }
-  fs.writeFile('./conf/logindetails.json', JSON.stringify(loginDetails), function (err) {
-    if (err) throw err;
-    eventEmitter.emit("saveLoginDetailsSuccess");
-  });
+  globalAuthToken = authToken;
+  globalRefreshToken = refreshToken;
+  var setInstituteCodePromise = keytar.setPassword("gkreta","instituteCode",instituteCode);
+  setInstituteCodePromise.then(
+    () => {
+      var setAuthTokenPromise = keytar.setPassword("gkreta","authToken",globalAuthToken);
+      setAuthTokenPromise.then(
+        () => {
+          var setRefreshTokenPromise =keytar.setPassword("gkreta","refreshToken",globalRefreshToken);
+          setRefreshTokenPromise.then(
+            () => {
+              eventEmitter.emit("saveLoginDetailsSuccess");
+            }  
+          );
+        }  
+      );
+    }  
+  );
+
+  var setAuthTokenPromise = keytar.setPassword("gkreta","authToken",authToken);
+  var setRefreshTokenPromise =keytar.setPassword("gkreta","refreshToken",refreshToken);
+  eventEmitter.emit("saveLoginDetailsSuccess");
 }
 
 function getLoginDetails() {
-  fs.readFile("./conf/logindetails.json", "utf8", (err, data) => {
-    if (err) throw err;
-    eventEmitter.emit("getLoginDetailsSuccess",JSON.parse(data).authToken,JSON.parse(data).instituteCode,JSON.parse(data).refreshToken);
-   });
+  var getInstituteCodePromise = keytar.getPassword("gkreta", "instituteCode");
+  getInstituteCodePromise.then(
+    (result) => {
+      globalInstituteCode = result;
+      var getAuthTokenPromise = keytar.getPassword("gkreta", "authToken");
+      getAuthTokenPromise.then(
+        (result) => {
+          globalAuthToken = result;
+          var getRefreshTokenPromise = keytar.getPassword("gkreta", "refreshToken");
+          getRefreshTokenPromise.then(
+            (result) => {
+              globalRefreshToken = result;
+              eventEmitter.emit("getLoginDetailsSuccess", globalInstituteCode, globalAuthToken, globalRefreshToken);
+            },
+            (err) => {
+            }
+          );
+        },
+        (err) => {
+        }
+      );
+    },
+    (err) => {
+    }
+  );
 }
 
 function makeNetRequest(method, protocol, hostname, path, headers, post_data, otherArgs) {
