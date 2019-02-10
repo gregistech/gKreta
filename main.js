@@ -10,75 +10,13 @@ var win = "";
 var dirConf = "./conf/";
 var dirHtm = "./htm/"
 
+var studentData = "";
+var timetableData = "";
+
 function startApplication () {
   eventEmitter.setMaxListeners(Infinity);
   createConfDir();
   loadCorrectWindowAtStart();
-
-  ipcMain.on('getInstitutesAndSendToRenderer', (event)=> { 
-    getInstitutes();
-    eventEmitter.on('institutesDownloaded', function instDownHandler(institutes) {
-      win.webContents.send("gotInstitutes",institutes);
-      eventEmitter.removeListener('institutesDownloaded', instDownHandler);
-    });
-  });
-
-  ipcMain.on('getStudentDataAndRegisterThenSendToRenderer', (event, instituteCode, username, password) => {
-    getStudentData(instituteCode, username, password);
-    saveSettings();
-    eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData, instituteCode, username, password) {
-      saveLoginDetails(instituteCode, username, password);
-      winDash = createWindow("dashboard.htm");
-      winDash.on("closed", () => {
-        winL = null;
-        app.quit();
-      });
-      win.close();
-      eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
-    });
-  });
-
-  ipcMain.on('getStudentDataAndSendToRenderer', (event) => {
-    getLoginDetails();
-    eventEmitter.on("gotLoginDetails", function loginDetailsHandler(instituteCode,username,password) {
-      getStudentData(instituteCode, username, password);
-      eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData) {
-        getTimetableData(instituteCode, username, password, studentData);
-        eventEmitter.on("timetableDownloaded", function timetableHandler(studentData, timetableData) {
-          if (studentData === 503) {
-            winDash.webContents.send("gotError", studentData);
-          } else if (studentData === 403) {
-            winDash.webContents.send("gotError", studentData);
-          } else {
-            winDash.webContents.send("gotStudentData",studentData,timetableData);
-          }
-          eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
-        });
-      });
-      eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
-    });
-  });
-
-  ipcMain.on('getStudentDataAndSendToRendererFirst', (event) => {
-    getLoginDetails();
-    eventEmitter.on("gotLoginDetails", function loginDetailsHandler(instituteCode,username,password) {
-      getStudentData(instituteCode, username, password);
-      eventEmitter.on('studentDataDownloaded', function studentDownHandler(studentData) {
-        getTimetableData(instituteCode, username, password, studentData);
-        eventEmitter.on("timetableDownloaded", function timetableHandler(studentData, timetableData) {
-          if (studentData === 503) {
-            winDash.webContents.send("gotError", studentData);
-          } else if (studentData === 403) {
-            winDash.webContents.send("gotError", studentData);
-          } else {
-            winDash.webContents.send("gotStudentData",studentData,timetableData);
-          }
-          eventEmitter.removeListener('studentDataDownloaded', studentDownHandler);
-        });
-      });
-      eventEmitter.removeListener("gotLoginDetails", loginDetailsHandler);
-    });
-  });
 
   ipcMain.on("saveSettings", (event,settingsJson) => {
     saveSettings(settingsJson);
@@ -87,6 +25,49 @@ function startApplication () {
 
   ipcMain.on("openExternalLink", (event, link) => {
     shell.openExternal(link);
+  });
+
+  ipcMain.on("getInstitutes", (event) => {
+    getInstitutes();
+    eventEmitter.once('getInstitutesSuccess', (institutes) => {
+      win.webContents.send("getInstitutesSuccess",institutes);
+    });
+  });
+
+  ipcMain.on("registerStudent", (event, instituteCode, username, password) => {
+    saveSettings();
+    getAuthToken(instituteCode, username, password);
+    globalInstituteCode = instituteCode;
+    eventEmitter.once("getAuthTokenSuccess", ( authToken, instituteCode, refreshToken) => {
+      saveLoginDetails(instituteCode, authToken, refreshToken);
+      eventEmitter.once("saveLoginDetailsSuccess", () => {
+        winDash = createWindow("dashboard.htm");
+        winDash.on("closed", () => {
+          winL = null;
+          app.quit();
+        });
+        win.close();
+      });
+    });
+
+    eventEmitter.once("getAuthTokenError", () => {
+      win.reload();
+    });
+  });
+
+  ipcMain.on('getStudentData', (event) => {
+    getAuthToken();
+    eventEmitter.on("getAuthTokenSuccess", function getAuthTokenSuccess(authToken, instituteCode) {
+      getStudentData(instituteCode, authToken);
+      eventEmitter.on("getStudentDataSuccess", function getStudentDataSuccess(studentDataM) {
+        studentData = studentDataM;
+        getTimetableData(studentData.InstituteCode, studentData.authToken);
+        eventEmitter.on("getTimetableDataSuccess", function getTimetableDataSuccess(timetableDataM) {
+          timetableData = timetableDataM;
+          winDash.webContents.send("getStudentDataSuccess",studentData,timetableData);
+        });
+      });
+    });
   });
 }
 
@@ -111,45 +92,35 @@ function createWindow(htmFile) {
   return winL;
 }
 
-function getTimetableData(instituteCode, username, password, studentData) {
-  getAuthToken(instituteCode, username, password, studentData);
-  eventEmitter.on('authTokenDownloaded', function authDownHandler(authToken, studentData) {
-    if (authToken === 503) {
-      eventEmitter.emit("timetableDownloaded", 503);
-      return;
-    } else if (authToken === 403) {
-      eventEmitter.emit("timetableDownloaded", 403);
-      return;
-    }
+function getTimetableData(instituteCode, authToken) {
+  var weekDetails = getWeekDetails(getMonday(new Date()));
 
-    StartDate = getMonday(new Date());
-    EndDate = addDays(StartDate, 6);
+  var dateString = "/mapi/api/v1/Lesson?fromDate=" + weekDetails.startYear + "-" + weekDetails.startMonth + "-" + weekDetails.startDay + "&toDate=" + weekDetails.endYear + "-" + weekDetails.endMonth + "-" + weekDetails.endDay;
 
-    var startYear = StartDate.getFullYear();
-    var startMonth = AddZeroToMonth(StartDate.getMonth()+1);
-    var startDay = AddZeroToMonth(StartDate.getDate());
+  makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu", dateString,{ "Authorization": "Bearer " + authToken});
 
-    var endYear = EndDate.getFullYear();
-    var endMonth = AddZeroToMonth(EndDate.getMonth()+1);
-    var endDay = AddZeroToMonth(EndDate.getDate());
-
-    var dateString = "/mapi/api/v1/Lesson?fromDate=" + startYear + "-" + startMonth + "-" + startDay + "&toDate=" + endYear + "-" + endMonth + "-" + endDay;
-
-    if (studentData === undefined)
-    studentData = 0;
-
-    makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu",dateString,{'Authorization': 'Bearer ' + authToken},null,studentData);
-
-    eventEmitter.on("makeNetRequestFinished",function netRequestHandler(response, other_args) {
-      eventEmitter.emit("timetableDownloaded", other_args, JSON.parse(response));
-      eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
-    });
-    eventEmitter.on("makeNetRequestFinishedWithError",function netRequestHandler(response) {
-      eventEmitter.emit("timetableDownloaded", response);
-      eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
-    });
-    eventEmitter.removeListener('authTokenDownloaded', authDownHandler);
+  eventEmitter.once("makeNetRequestSuccess", function makeNetRequestSuccess(timetableData) {
+    eventEmitter.emit("getTimetableDataSuccess", JSON.parse(timetableData));
   });
+
+  eventEmitter.once("makeNetRequestError", function makeNetRequestSuccess(errorCode) { 
+  });
+}
+
+function getWeekDetails(startDate) {
+  endDate = addDays(startDate, 6)
+
+  weekDetails = {
+    startYear: startDate.getFullYear(),
+    startMonth: AddZeroToMonth(startDate.getMonth()+1),
+    startDay: AddZeroToMonth(startDate.getDate()),
+
+    endYear: endDate.getFullYear(),
+    endMonth: AddZeroToMonth(endDate.getMonth()+1),
+    endDay: AddZeroToMonth(endDate.getDate())
+  }
+
+  return weekDetails;
 }
 
 function AddZeroToMonth(month) {
@@ -172,110 +143,101 @@ function getMonday(d) {
   return new Date(d.setDate(diff));
 }
 
-function getAuthToken(instituteCode, username, password, studentData) {
-  post_data = "institute_code=" + instituteCode + "&userName=" + username + "&password=" + password + "&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
-  makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(post_data)}, post_data);
-  
-  eventEmitter.on("makeNetRequestFinished", function netRequestHandler(response) {
-    eventEmitter.emit("authTokenDownloaded", JSON.parse(response).access_token, studentData);
-    eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
-  });
+function getAuthToken(instituteCode, username, password) {
+  if (instituteCode === undefined || instituteCode === null) {
+    getLoginDetails();
+    eventEmitter.once("getLoginDetailsSuccess", (authToken, instituteCode, refreshToken) => {
+      eventEmitter.emit("getAuthTokenSuccess", authToken, instituteCode, refreshToken);
+    });
+  } else {
+    postData = "institute_code=" + instituteCode + "&userName=" + username + "&password=" + password + "&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
+    makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
+    eventEmitter.once("makeNetRequestSuccess", (response, instituteCode) => {
+      response = JSON.parse(response);
+      eventEmitter.emit("getAuthTokenSuccess", response.access_token, instituteCode, response.refresh_token);
+    });
 
-  eventEmitter.on("makeNetRequestFinishedWithError", function netRequestHandler(response){
-    eventEmitter.emit("authTokenDownloaded", response);
-    eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
-  });
+    eventEmitter.once("makeNetRequestError", () => {
+      eventEmitter.emit("getAuthTokenError");
+    });
+  }
 }
 
-function getStudentData(instituteCode, username, password) {
-  getAuthToken(instituteCode, username, password);
-  eventEmitter.on('authTokenDownloaded', function authDownHandler(authToken) {
-    if (authToken === 503) {
-      eventEmitter.emit("studentDataDownloaded", 503);
-      return;
-    } else if (authToken === 403) {
-      eventEmitter.emit("studentDataDownloaded", 403);
-      return;
-    }
-    var other_args = new Array();
-    other_args[0] = instituteCode;
-    other_args[1] = username;
-    other_args[2] = password;
-    makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu","/mapi/api/v1/Student",{ "Authorization": "Bearer " + authToken},null,other_args);
+function getStudentData(instituteCode, authToken) {
+  makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu","/mapi/api/v1/Student",{ "Authorization": "Bearer " + authToken}, null, authToken);
 
-    eventEmitter.on("makeNetRequestFinished", function netRequestHandler(response, other_args) {
-      eventEmitter.emit("studentDataDownloaded", JSON.parse(response), other_args[0], other_args[1], other_args[2]);
-      eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
-      return;
-    });
+  eventEmitter.once("makeNetRequestSuccess", function makeNetRequestSuccess(studentData, authToken) {
+    studentData = JSON.parse(studentData);
+    studentData.authToken = authToken;
+    eventEmitter.emit("getStudentDataSuccess", studentData);
+  });
 
-    eventEmitter.on("makeNetRequestFinishedWithError", function netRequestHandler(response) {
-      eventEmitter.emit("studentDataDownloaded", response);
-      eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
-      return;
-    });
-    eventEmitter.removeListener('authTokenDownloaded', authDownHandler);
+  eventEmitter.once("makeNetRequestError", function makeNetRequestSuccess(response) { 
   });
 }
 
 function getInstitutes() {
   makeNetRequest("GET","https:","kretaglobalmobileapi.ekreta.hu","/api/v1/Institute", {"apiKey": "7856d350-1fda-45f5-822d-e1a2f3f1acf0"});
 
-  eventEmitter.on("makeNetRequestFinished",function netRequestHandler(response) {
-    eventEmitter.emit("institutesDownloaded", response);
+  eventEmitter.on("makeNetRequestSuccess",function netRequestHandler(response) {
+    eventEmitter.emit("getInstitutesSuccess", response);
     eventEmitter.removeListener("makeNetRequestFinished", netRequestHandler);
   });
-  eventEmitter.on("makeNetRequestFinishedWithError",function netRequestHandler(response) {
-    eventEmitter.emit("institutesDownloaded", response);
+  eventEmitter.on("makeNetRequestError",function netRequestHandler(response) {
+    eventEmitter.emit("getInstitutesError", response);
     eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
   });
 }
 
-function saveLoginDetails(instituteCode, username, password) {
+function saveLoginDetails(instituteCode, authToken, refreshToken) {
   var loginDetails = {
-    "instituteCode" : instituteCode,
-    "username" : username,
-    "password" : password
+    "instituteCode": instituteCode,
+    "authToken": authToken,
+    "refreshToken": refreshToken 
   }
   fs.writeFile('./conf/logindetails.json', JSON.stringify(loginDetails), function (err) {
     if (err) throw err;
+    eventEmitter.emit("saveLoginDetailsSuccess");
   });
 }
 
 function getLoginDetails() {
   fs.readFile("./conf/logindetails.json", "utf8", (err, data) => {
     if (err) throw err;
-    eventEmitter.emit("gotLoginDetails",JSON.parse(data).instituteCode,JSON.parse(data).username,JSON.parse(data).password);
+    eventEmitter.emit("getLoginDetailsSuccess",JSON.parse(data).authToken,JSON.parse(data).instituteCode,JSON.parse(data).refreshToken);
    });
 }
 
-function makeNetRequest(method, protocol, hostname, path, headers, post_data, other_args) {
-  const request = net.request({
-    method: method,
-    protocol: protocol,
-    hostname: hostname,
-    path: path, 
-    headers: headers
-  });
+function makeNetRequest(method, protocol, hostname, path, headers, post_data, otherArgs) {
+    const request = net.request({
+      method: method,
+      protocol: protocol,
+      hostname: hostname,
+      path: path, 
+      headers: headers
+    });
 
-  res_string = "";
-  request.on("response", (response) => {
-    response.on('data', (chunk) => {
-      res_string += chunk;
+    res_string = {
+      otherArgs: otherArgs,
+      message: ""
+    };
+    request.on("response", (response) => {
+      response.on('data', (chunk) => {
+        res_string.message += chunk;
+      });
+      response.on('end', () => {
+        if (response.statusCode === 200) {
+          eventEmitter.emit("makeNetRequestSuccess", res_string.message, res_string.otherArgs);
+          return;
+        } else {
+          eventEmitter.emit("makeNetRequestError", response, res_string.otherArgs);
+          return;
+        }
+      });
     });
-    response.on('end', () => {
-      if (response.statusCode === 200) {
-        eventEmitter.emit("makeNetRequestFinished", res_string, other_args);
-        return;
-      } else {
-        eventEmitter.emit("makeNetRequestFinishedWithError", response.statusCode, other_args);
-        return;
-      }
-    });
-  });
-  if (post_data !== undefined && post_data !== null)  
-    request.write(post_data);
-  request.end();
+    if (post_data !== undefined && post_data !== null)  
+      request.write(post_data);
+    request.end();
 }
 
 function saveSettings(settingsJson) {

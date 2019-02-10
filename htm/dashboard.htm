@@ -42,19 +42,20 @@
                 var currentTab = "Dashboard";
 
                 var intervalID = "";
+                intervalID = setInterval(() => {ipc.send('getStudentData')}, 300000);
+                ipc.send('getStudentData');
 
-                ipc.send('getStudentDataAndSendToRendererFirst');
-                ipc.on("gotStudentDataFirst", function studentDataHandler(event,studentDataL) {
+                ipc.on("getStudentDataSuccess", function studentDataHandler(event,studentDataL,timetableDataL) {
                     studentData = studentDataL;
                     timetableData = timetableDataL;
-                    refreshData();
-                    intervalID = setInterval(refreshData, 300000);
-                    loading = false;
+                    setupFirstWindow();
                 });
 
-                ipc.on("gotStudentData", function studentDataHandler(event,studentDataL, timetableDataL) {
-                    studentData = studentDataL;
-                    timetableData = timetableDataL;
+                ipc.on("getStudentDataError", function errorDataHandler(event, errorCode) {
+                    displayErrorTab(errorCode); 
+                });
+
+                function setupFirstWindow() {
                     $('#content').empty();
                     var h1Name = $("<h1 style='margin-top: 30px;'>" + studentData.Name + "<h1/>");
                     var hr = $("<hr />")
@@ -64,15 +65,6 @@
                     tabDiv.appendTo('#content');
                     displayTab(currentTab);
                     loading = false;
-                });
-
-
-                ipc.on("gotError", function errorDataHandler(event, errorCode) {
-                    displayErrorTab(errorCode); 
-                });
-
-                function refreshData() {
-                    ipc.send('getStudentDataAndSendToRenderer');
                 }
 
                 function capitalizeFirstLetter(string) {

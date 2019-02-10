@@ -35,11 +35,12 @@
     <div id="content">  
       <script>
         var ipc = require("electron").ipcRenderer;
-        ipc.send('getInstitutesAndSendToRenderer');
+        ipc.send('getInstitutes');
 
         var institutes = "";
-        ipc.on("gotInstitutes",(event, institutesL) => {
+        ipc.on("getInstitutesSuccess",(event, institutesL) => {
           institutes = JSON.parse(institutesL);
+
           var cities = new Array();
           var instituteCode = "";
           var username = "";
@@ -115,7 +116,7 @@
         function PasswordSelected() {
           password = $('#tbPassword').val();
           
-          ipc.send('getStudentDataAndRegisterThenSendToRenderer', instituteCode, username, password);
+          ipc.send("registerStudent", instituteCode, username, password);
         }
       </script>
     </div>
