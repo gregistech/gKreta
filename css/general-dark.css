@@ -39,6 +39,7 @@ input {
 
 #title-bar {
     -webkit-app-region: drag;
+    -webkit-user-select:none;
     height: 24px; 
     background-color: #2a2a2a;
     padding: none;
@@ -96,6 +97,7 @@ hr {
     background-color: #2a2a2a; 
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 60px; /* Place content 60px from the top */
+    -webkit-user-select:none;
 }
 .sidenav a {
     padding: 8px 8px 8px 3px;
