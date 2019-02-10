@@ -27,6 +27,7 @@
                 <a onclick="onNavClick('Evaluations')"><script>document.write(locale["evals"])</script></a>
                 <a onclick="onNavClick('Timetable')"><script>document.write(locale["timetable"])</script></a>
                 <a onclick="onNavClick('Absences')"><script>document.write(locale["absences"])</script></a>
+                <a onclick="onNavClick('Notes')"><script>document.write(locale["notes"])</script></a>
                 <a onclick="onNavClick('Settings')"><script>document.write(locale["settings"])</script></a>
         </div>
         <div id="content">  
@@ -89,6 +90,10 @@
                             }
                             case "Absences": {
                                 tabLocalized = locale["absences"];
+                                break;
+                            }
+                            case "Notes": {
+                                tabLocalized = locale["notes"];
                                 break;
                             }
                             case "Settings": {
@@ -478,6 +483,23 @@
                                     } 
                                 }
                             }                          
+                            break;
+                        }
+
+                        case "Notes": {
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + locale["notes"] + "</h2>");
+                            var notes = studentData.Notes;   
+                            
+                            for (i = 0; i < Object.keys(notes).length; i++) {
+                                $("<hr/>").appendTo("#tabDiv");
+                                var h3CurrentNoteTitle = $("<h3>" + notes[i].Title + "</h3>");
+                                h3CurrentNoteTitle.appendTo("#tabDiv");
+                                var pCurrentNoteContent = $("<p>" + notes[i].Content + "</p>");
+                                pCurrentNoteContent.appendTo("#tabDiv");
+                                var bCurrentNoteTeacher = $("<b> -" + notes[i].Teacher + "</b>");
+                                bCurrentNoteTeacher.appendTo("#tabDiv");
+                            }   
                             break;
                         }
 
