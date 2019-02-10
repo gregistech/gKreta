@@ -242,7 +242,7 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data, ot
 
 function saveSettings(settingsJson) {
   if (settingsJson === null || settingsJson === undefined || settingsJson === "")
-    settingsJson = {"locale" : "en", "encrypt" : "false"};
+    settingsJson = {"locale" : "en"};
 
   fs.writeFile(dirConf + '/settings.json', JSON.stringify(settingsJson), function (err) {
     if (err) throw err;
