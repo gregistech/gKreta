@@ -1,3 +1,5 @@
+[banner980150.png](https://raw.githubusercontent.com/thegergo02/gKreta/master/img/banner980150.png)
+
 ## Description
 * Based on Electron, this is a replacement for KRÉTA's web interface.
     * You can easily select your school. (No need for that klik********* code.)
