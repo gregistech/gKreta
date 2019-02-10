@@ -6,6 +6,7 @@
     * All of your evaluations. 
     * An organized timetable.
     * All of your absences ordered by date.
+    * Every note you get.
     * A settings panel.
     * Two languages: English and Hungarian. (Again, in the future I add more.)
 
