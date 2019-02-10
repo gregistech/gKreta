@@ -46,6 +46,7 @@
         "hu": "Hungarian",
         "yes": "Yes",
         "no": "No",
+        "encryption": "Encryption",
         "save_settings": "Save settings"
     }
 }

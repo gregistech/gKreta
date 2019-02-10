@@ -263,7 +263,8 @@
 
                 function saveSettings() {
                     var settingsJson = {
-                        "locale" : $("#sLocale").val()
+                        "locale" : $("#sLocale").val(),
+                        "encrypt" : $("#sEncrypt").val()
                     }
                     ipc.send("saveSettings", settingsJson);
                 };
@@ -498,6 +499,20 @@
                                 }
                             }
 
+                            var encryptionSelected = new Array();
+                            switch (settings["encrypt"]) {
+                                case "false": {
+                                    encryptionSelected[0] = " selected ";
+                                    encryptionSelected[1] = "";
+                                    break;
+                                }
+                                case "true": {
+                                    encryptionSelected[0] = " disabled ";
+                                    encryptionSelected[1] = " selected ";
+                                    break;
+                                }
+                            }
+
                             var pLocale = $("<p>" + locale["language"] + ": </p>");
                             pLocale.appendTo("#tabDiv");
                             var sLocale = $('<select id="sLocale"/>');
@@ -508,6 +523,15 @@
                             sLocaleHu.appendTo("#sLocale");
 
                             $("<br />").appendTo("#tabDiv");
+
+                            var pEncrypt = $("<p>" + locale["encryption"] + ": </p>");
+                            pEncrypt.appendTo("#tabDiv");
+                            var sEncrypt = $('<select id="sEncrypt"/>');
+                            sEncrypt.appendTo("#tabDiv");
+                            var sEncryptNo = $('<option value="false"' + encryptionSelected[0] + '>' + locale["no"] + '</option>');
+                            sEncryptNo.appendTo("#sEncrypt");
+                            var sEncryptYes = $('<option value="true"' + encryptionSelected[1] + '>' + locale["yes"] + '</option>');
+                            sEncryptYes.appendTo("#sEncrypt");
 
                             var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
                             bSaveSettings.appendTo("#tabDiv");

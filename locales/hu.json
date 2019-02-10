@@ -44,8 +44,11 @@
         "language": "Nyelv",
         "en": "Angol",
         "hu": "Magyar",
-        "yes": "Yes",
-        "no": "No",
+
+        "encryption": "Titkosítás",
+        "yes": "Igen",
+        "no": "Nem",
+        
         "save_settings": "Beállítások mentése"
     }
 }
