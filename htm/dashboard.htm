@@ -43,8 +43,17 @@
                 var currentTab = "Dashboard";
 
                 var intervalID = "";
-                intervalID = setInterval(() => {ipc.send('getStudentData')}, 300000);
-                ipc.send('getStudentData');
+
+                ipc.send("isGetStudentDataRunning");
+
+                ipc.on("isGetStudentDataRunning", (event, isGetStudentDataRunning) => {
+                    if (isGetStudentDataRunning) {
+                        setTimeout(() => {ipc.send("isGetStudentDataRunning")}, 5000);
+                    } else {
+                        intervalID = setInterval(() => {ipc.send('getStudentData')}, 300000);
+                        ipc.send('getStudentData');
+                    }
+                });
 
                 ipc.on("getStudentDataSuccess", function studentDataHandler(event,studentDataL,timetableDataL) {
                     studentData = studentDataL;

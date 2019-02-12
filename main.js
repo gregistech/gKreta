@@ -14,6 +14,8 @@ var dirHtm = "./htm/"
 var studentData = "";
 var timetableData = "";
 
+var isGetStudentDataRunning = false;
+
 var globalInstituteCode = "";
 var globalAuthToken = "";
 var globalRefreshToken = "";
@@ -59,17 +61,26 @@ function startApplication () {
     });
   });
 
+  ipcMain.on("isGetStudentDataRunning", () => {
+    winDash.webContents.send("isGetStudentDataRunning", isGetStudentDataRunning);
+  });
+
   ipcMain.on('getStudentData', (event) => {
+    isGetStudentDataRunning = true;
     getAuthToken();
-    eventEmitter.on("getAuthTokenSuccess", function getAuthTokenSuccess(authToken, instituteCode) {
+    eventEmitter.once("getAuthTokenSuccess", function getAuthTokenSuccess(authToken, instituteCode) {
       getStudentData(instituteCode, authToken);
-      eventEmitter.on("getStudentDataSuccess", function getStudentDataSuccess(studentDataM) {
+      eventEmitter.once("getStudentDataSuccess", function getStudentDataSuccess(studentDataM) {
         studentData = studentDataM;
         getTimetableData(studentData.InstituteCode, studentData.authToken);
-        eventEmitter.on("getTimetableDataSuccess", function getTimetableDataSuccess(timetableDataM) {
+        eventEmitter.once("getTimetableDataSuccess", function getTimetableDataSuccess(timetableDataM) {
           timetableData = timetableDataM;
           winDash.webContents.send("getStudentDataSuccess",studentData,timetableData);
+          isGetStudentDataRunning = false;
         });
+      });
+      eventEmitter.once("getStudentDataError", () => {
+        isGetStudentDataRunning = false;
       });
     });
   });
