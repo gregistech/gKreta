@@ -2,3 +2,4 @@ node_modules/
 conf/
 builds/
 gKreta.sh
+gKreta.code-workspace
