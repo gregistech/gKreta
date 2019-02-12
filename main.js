@@ -14,8 +14,6 @@ var dirHtm = "./htm/"
 var studentData = "";
 var timetableData = "";
 
-var globalInstituteCode2 = "";
-
 var globalInstituteCode = "";
 var globalAuthToken = "";
 var globalRefreshToken = "";
@@ -44,7 +42,6 @@ function startApplication () {
   ipcMain.on("registerStudent", (event, instituteCode, username, password) => {
     saveSettings();
     getAuthToken(instituteCode, username, password);
-    globalInstituteCode2 = instituteCode;
     eventEmitter.once("getAuthTokenSuccess", ( authToken, instituteCode, refreshToken) => {
       saveLoginDetails(instituteCode, authToken, refreshToken);
       eventEmitter.once("saveLoginDetailsSuccess", () => {
