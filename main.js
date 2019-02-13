@@ -108,7 +108,7 @@ function createConfDir() {
 }
 
 function createWindow(htmFile) {
-  winL = new BrowserWindow({ width: 1000, height: 600, nodeIntegration: true, frame: false });
+  winL = new BrowserWindow({ width: 1200, height: 800, nodeIntegration: true, frame: false });
   winL.loadFile(dirHtm + htmFile);
   return winL;
 }
