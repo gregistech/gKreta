@@ -185,9 +185,10 @@ function getAuthToken(instituteCode, username, password) {
   }
 }
 
-function refreshToken(instituteCode, refreshToken) {
+function refreshStudentToken(instituteCode, refreshToken) {
   postData = "refresh_token=" + refreshToken + "&grant_type=refresh_token&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
   makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
+  console.log("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
   eventEmitter.once("makeNetRequestSuccess", (response, instituteCode) => {
     response = JSON.parse(response);
     saveLoginDetails(instituteCode,response.access_token,response.refresh_token);
@@ -200,20 +201,23 @@ function refreshToken(instituteCode, refreshToken) {
 }
 
 function getStudentData(instituteCode, authToken) {
-  makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu","/mapi/api/v1/Student",{ "Authorization": "Bearer " + authToken}, null, authToken);
+  makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu","/mapi/api/v1/Student",{ "Authorization": "Bearer " + authToken}, null, {0: authToken, 1: instituteCode});
 
-  eventEmitter.once("makeNetRequestSuccess", (studentData, authToken) => {
+  eventEmitter.once("makeNetRequestSuccess", (studentData, otherArgs) => {
     studentData = JSON.parse(studentData);
-    studentData.authToken = authToken;
+    studentData.authToken = otherArgs[0];
     eventEmitter.emit("getStudentDataSuccess", studentData);
   });
 
-  eventEmitter.once("makeNetRequestError", (response) => { 
+  eventEmitter.once("makeNetRequestError", (response, otherArgs) => { 
     if (response.statusCode === 401) {
-      refreshToken();
-      eventEmitter.once("refreshTokenSuccess", (instituteCode, authToken, refreshToken) => {
-        getStudentData(instituteCode, authToken);
-      }); 
+      getLoginDetails();
+      eventEmitter.once("getLoginDetailsSuccess", (instituteCode, authToken, refreshToken) => {
+        refreshStudentToken(instituteCode, refreshToken);
+        eventEmitter.once("refreshTokenSuccess", (instituteCode, authToken, refreshToken) => {
+          getStudentData(instituteCode, authToken);
+        }); 
+      });
     } else {
       eventEmitter.emit("getStudentDataError", response);
     }
@@ -252,9 +256,6 @@ function saveLoginDetails(instituteCode, authToken, refreshToken) {
       );
     }  
   );
-
-  var setAuthTokenPromise = keytar.setPassword("gkreta","authToken",authToken);
-  var setRefreshTokenPromise =keytar.setPassword("gkreta","refreshToken",refreshToken);
   eventEmitter.emit("saveLoginDetailsSuccess");
 }
 
