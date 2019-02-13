@@ -140,7 +140,7 @@
                             //TODO
                         }
                         case "evals": {
-                            var evalDiv = $("<div style='display: inline-block;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
+                            var evalDiv = $("<div style='display: inline-block; vertical-align: top;;margin: 10px;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
                             evalDiv.appendTo("#tabDiv");
                             var evalH3 = $("<h3>" + locale["evals"] + "</h3>");
                             evalH3.appendTo("#evalDiv");
@@ -160,10 +160,42 @@
                             evalsTextP.appendTo("#evalDiv");
                             break;
                         }
+                        case "halfyear": {
+                            var halfyearDiv = $("<div style='display: inline-block; margin: 10px; vertical-align: top; border-width: 2px;border-style: solid;border-color: #555;' id='halfyearDiv' />");
+                            halfyearDiv.appendTo("#tabDiv");
+                            var halfyearH3 = $("<h3>" + locale["current_avgs"] + "</h3>");
+                            halfyearH3.appendTo("#halfyearDiv");
+                            var evalCount = 0;
+                            for (i = 0; i < Object.keys(other_args).length; i++) {
+                                if (other_args[i].Value !== 0) {
+                                    if (other_args[i].Value === 5) {
+                                        currentHalfYearEvalColor = "#03a338";
+                                    } else if (other_args[i].Value < 5 || other_args[i].Value >= 4.5) {
+                                        currentHalfYearEvalColor = "#a1ff5e";
+                                    } else if (other_args[i].Value < 4.5 || other_args[i].Value >= 3.5) {
+                                        currentHalfYearEvalColor = "#bed300";
+                                    } else if (other_args[i].Value < 3.5 || other_args[i].Value >= 2.5) {
+                                        currentHalfYearEvalColor = "#ed5300";
+                                    } else if (other_args[i].Value < 2.5 || other_args[i].Value >= 1.5) {
+                                        currentHalfYearEvalColor = "#ff0202";
+                                    } else if (other_args[i].Value < 1.5 || other_args[i].Value >= 2.5) {
+                                        currentHalfYearEvalColor = "#820000";
+                                    } else {
+                                        currentHalfYearEvalColor = "#820000";
+                                    }
+                                    
+                                    var currentHalfYearEval = $("<p>" + other_args[i].Subject + ": <span style='color: " + currentHalfYearEvalColor + ";'> " + other_args[i].Value + "</span></p>");
+                                    currentHalfYearEval.appendTo("#halfyearDiv");
+                                    evalCount++;
+                                }
+                            }
+
+                            break;
+                        }
                         case "absences": {
-                            var absDiv = $("<div style='display: inline-block;float: right;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
+                            var absDiv = $("<div style='display: inline-block;margin: 10px; vertical-align: top;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
                             absDiv.appendTo("#tabDiv");
-                            var absH3 = $("<h3>Absences</h3>");
+                            var absH3 = $("<h3>" + locale["absences"] + "</h3>");
                             absH3.appendTo("#absDiv");
                             var allAbsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["lowercase_abs"] + ".</p>");  
                             allAbsP.appendTo("#absDiv");
@@ -362,6 +394,7 @@
                             absDivArray[2] = beJustifiedAbsences;
                             absDivArray[3] = medicalAbsences;
 
+                            generateDiv("halfyear", studentData.SubjectAverages);
                             generateDiv("evals", evalsDivArray);
                             generateDiv("absences", absDivArray);
                             break;

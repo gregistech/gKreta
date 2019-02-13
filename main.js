@@ -287,14 +287,14 @@ function getLoginDetails() {
 }
 
 function makeNetRequest(method, protocol, hostname, path, headers, post_data, otherArgs) {
-    const request = net.request({
-      method: method,
-      protocol: protocol,
-      hostname: hostname,
-      path: path, 
-      headers: headers
-    });
-
+  try {
+      const request = net.request({
+        method: method,
+        protocol: protocol,
+        hostname: hostname,
+        path: path, 
+        headers: headers
+      });
     res_string = {
       otherArgs: otherArgs,
       message: ""
@@ -316,6 +316,10 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data, ot
     if (post_data !== undefined && post_data !== null)  
       request.write(post_data);
     request.end();
+  }
+  catch (e) {
+    console.log(e);
+  }
 }
 
 function saveSettings(settingsJson) {
