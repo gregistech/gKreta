@@ -67,20 +67,26 @@ function startApplication () {
 
   ipcMain.on('getStudentData', (event) => {
     isGetStudentDataRunning = true;
-    getAuthToken();
-    eventEmitter.once("getAuthTokenSuccess", function getAuthTokenSuccess(authToken, instituteCode) {
-      getStudentData(instituteCode, authToken);
-      eventEmitter.once("getStudentDataSuccess", function getStudentDataSuccess(studentDataM) {
-        studentData = studentDataM;
-        getTimetableData(studentData.InstituteCode, studentData.authToken);
-        eventEmitter.once("getTimetableDataSuccess", function getTimetableDataSuccess(timetableDataM) {
-          timetableData = timetableDataM;
-          winDash.webContents.send("getStudentDataSuccess",studentData,timetableData);
-          isGetStudentDataRunning = false;
+    getLoginDetails()
+    eventEmitter.once("getLoginDetailsSuccess", (instituteCode, authToken, refreshToken) => {
+      refreshStudentToken(instituteCode, refreshToken);
+      eventEmitter.once("refreshTokenSuccess", () => {
+        getAuthToken();
+        eventEmitter.once("getAuthTokenSuccess", function getAuthTokenSuccess(authToken, instituteCode) {
+          getStudentData(instituteCode, authToken);
+          eventEmitter.once("getStudentDataSuccess", function getStudentDataSuccess(studentDataM) {
+            studentData = studentDataM;
+            getTimetableData(studentData.InstituteCode, studentData.authToken);
+            eventEmitter.once("getTimetableDataSuccess", function getTimetableDataSuccess(timetableDataM) {
+              timetableData = timetableDataM;
+              winDash.webContents.send("getStudentDataSuccess",studentData,timetableData);
+              isGetStudentDataRunning = false;
+            });
+          });
+          eventEmitter.once("getStudentDataError", () => {
+            isGetStudentDataRunning = false;
+          });
         });
-      });
-      eventEmitter.once("getStudentDataError", () => {
-        isGetStudentDataRunning = false;
       });
     });
   });

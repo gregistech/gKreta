@@ -1,6 +1,6 @@
 {
   "name": "gkreta",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "It's an application for displaying your informations from the KRÉTA systems. (Written in Electron)",
   "main": "main.js",
   "scripts": {
@@ -17,9 +17,9 @@
   },
   "devDependencies": {
     "electron": "^4.0.4",
-    "electron-builder": "^20.38.5"
+    "electron-builder": "^20.38.5",
+    "electron-rebuild": "^1.8.4"
   },
-
   "build": {
     "appId": "thegergo02.gkreta",
     "productName": "gKreta",
