@@ -4,12 +4,68 @@
   "description": "It's an application for displaying your informations from the KRÉTA systems. (Written in Electron)",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:linux": "electron-builder --linux appimage"
   },
   "author": "thegergo02",
   "license": "GPL-3.0",
+  "dependencies": {
+    "keytar": "^4.4.0"
+  },
   "devDependencies": {
     "electron": "^4.0.4",
-    "keytar": "^4.4.0"
+    "electron-builder": "^20.38.5"
+  },
+
+  "build": {
+    "appId": "thegergo02.gkreta",
+    "productName": "gKreta",
+    "artifactName": "${productName}.${ext}",
+    "copyright": "Copyright © 2019 Gergő Vári",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": "x64"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.education"
+    },
+    "linux": {
+      "target": "AppImage",
+      "maintainer": "thegergo02",
+      "vendor": "gKreta",
+      "synopsis": "Based on Electron, a replacement for KRÉTA's web interface.",
+      "description": "Based on Electron, this is a replacement for KRÉTA's web interface.",
+      "category": "Education"
+    },
+    "deb": {
+      "compression": "xz",
+      "packageCategory": "Education",
+      "priority": "optional"
+    },
+    "compression": "maximum",
+    "files": [
+      "!{dist,.gitignore,.github,.conf,dist}"
+    ],
+    "extraResources": [
+      "libraries"
+    ],
+    "asar": true
   }
 }

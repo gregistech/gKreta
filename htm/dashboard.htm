@@ -3,12 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <script>
+        var ipc = require("electron").ipcRenderer;    
+
         window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
         require("../modules/titlebar.js");
-        var settings = require("../conf/settings.json");
-        var locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
+
+        var settings = "";
+        var locale = "";
+        ipc.send("getSettings");
+        ipc.once("getSettingsSuccess", (event, data) => {
+            settings = data;
+            locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
+            document.title = "gKréta - " + locale["dashboard"]
+        });    
+
         </script>
-        <script>document.title = "gKréta - " + locale["dashboard"]</script>
         <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
     </head>
     <body>
@@ -32,7 +41,6 @@
         </div>
         <div id="content">  
             <script>
-                var ipc = require("electron").ipcRenderer;
 
                 var isErrorPage = false;
                 var loading = true;

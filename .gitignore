@@ -3,3 +3,5 @@ conf/
 builds/
 gKreta.sh
 gKreta.code-workspace
+*.tgz
+dist/

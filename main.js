@@ -84,6 +84,13 @@ function startApplication () {
       });
     });
   });
+
+  ipcMain.on("getSettings", () => {
+    getSettings();
+    eventEmitter.once("getSettingsSuccess", (settings) => {
+      winDash.webContents.send("getSettingsSuccess", settings);
+    });
+  });
 }
 
 function loadCorrectWindowAtStart() {
@@ -330,13 +337,13 @@ function saveSettings(settingsJson) {
   fs.writeFile(dirConf + '/settings.json', JSON.stringify(settingsJson), function (err) {
     if (err) throw err;
   });
-  eventEmitter.emit("savedSettings");
+  eventEmitter.emit("saveSettingsSuccess");
 }
 
 function getSettings() {
   fs.readFile(dirConf + "/settings.json", "utf8", (err, data) => {
     if (err) saveSettings();
-    eventEmitter.emit("gotSettings",JSON.parse(data));
+    eventEmitter.emit("getSettingsSuccess",JSON.parse(data));
    });
 }
 
