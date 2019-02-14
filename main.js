@@ -8,7 +8,7 @@ var eventEmitter = new events.EventEmitter();
 var winDash = "";
 var win = "";
 
-var dirConf = "./conf/";
+var dirConf =  app.getPath('userData') + "/conf/";
 var dirHtm = "./htm/"
 
 var studentData = "";
