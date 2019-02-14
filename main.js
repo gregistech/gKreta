@@ -201,7 +201,6 @@ function getAuthToken(instituteCode, username, password) {
 function refreshStudentToken(instituteCode, refreshToken) {
   postData = "refresh_token=" + refreshToken + "&grant_type=refresh_token&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
   makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
-  console.log("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
   eventEmitter.once("makeNetRequestSuccess", (response, instituteCode) => {
     response = JSON.parse(response);
     saveLoginDetails(instituteCode,response.access_token,response.refresh_token);
@@ -332,7 +331,6 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data, ot
     request.end();
   }
   catch (e) {
-    console.log(e);
   }
 }
 

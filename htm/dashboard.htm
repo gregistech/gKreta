@@ -7,6 +7,7 @@
 
         window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
         require("../modules/titlebar.js");
+        var package = require("../package.json");
 
         var settings = "";
         var locale = "";
@@ -584,7 +585,10 @@
                             var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
                             bSaveSettings.appendTo("#tabDiv");
 
-                            var linkToIcons8 = $("<br /><br /><a style='color: #555;' href='#' onclick='openExternalLink(\"https://icons8.com\")'>Icons by Icons8</a>");
+                            var pVersion = $("<br /><br /><p>Your version: " + package["version"] + "</p>");
+                            pVersion.appendTo("#tabDiv");
+
+                            var linkToIcons8 = $("<br /><a style='color: #555;' href='#' onclick='openExternalLink(\"https://icons8.com\")'>Icons by Icons8</a>");
                             linkToIcons8.appendTo("#tabDiv");
                             break;
                         }
