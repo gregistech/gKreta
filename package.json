@@ -7,7 +7,8 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "dist:linux": "electron-builder --linux appimage"
+    "dist:linux": "electron-builder --linux appimage",
+    "dist:win": "electron-builder --win"
   },
   "author": "thegergo02",
   "license": "GPL-3.0",
