@@ -3,25 +3,28 @@
     <head>
         <meta charset="UTF-8">
         <script>
-        var ipc = require("electron").ipcRenderer;    
-
-        window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
-        require("../modules/titlebar.js");
-        var package = require("../package.json");
-
         var settings = "";
         var locale = "";
+
+        var ipc = require("electron").ipcRenderer;    
         ipc.send("getSettings");
         ipc.once("getSettingsSuccess", (event, data) => {
             settings = data;
+            if (settings === null || settings === undefined || settings === "") {
+                settings = "en";
+            }
             locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
-            document.title = "gKréta - " + locale["dashboard"]
+            if  (locale["dashboard"]  ===  undefined)
+            ipc.send("getSettings");
+
+            document.title = "gKréta - " + locale["dashboard"];
         });    
 
         </script>
         <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
     </head>
     <body>
+        <script> require("../modules/titlebar.js");</script>
         <div id="title-bar-bg">
             <div id="title-bar">
                 <div id="title"><script>document.write(document.title)</script></div>
@@ -42,6 +45,7 @@
         </div>
         <div id="content">  
             <script>
+                window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
 
                 var isErrorPage = false;
                 var loading = true;
@@ -585,6 +589,7 @@
                             var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
                             bSaveSettings.appendTo("#tabDiv");
 
+                            var package = require("../package.json");
                             var pVersion = $("<br /><br /><p>Your version: " + package["version"] + "</p>");
                             pVersion.appendTo("#tabDiv");
 
