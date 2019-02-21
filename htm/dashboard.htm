@@ -14,9 +14,7 @@
                 settings = "en";
             }
             locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
-            if  (locale["dashboard"]  ===  undefined)
-            ipc.send("getSettings");
-
+                
             document.title = "gKréta - " + locale["dashboard"];
         });    
 
