@@ -100,41 +100,47 @@ function startApplication () {
 
 	ipcMain.on("exportToFile", (event, exportType, exportFormat, exportData) => {
 		var savePath = dialog.showSaveDialog(winDash, {buttonLabel: "Export", defaultPath: exportType + "." + exportFormat});
-		switch (exportFormat) {
-			case "html": {
-				switch (exportType) {
-					case  "avgEvals": {
-						var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;} table, td, tr, th {text-align: center;color: #555;border-width: 2px;border-style: solid;}</style></head><body>";
-						htmlCode += exportData;
-						htmlCode += "</body></html>";
-						try  {
-							fs.writeFileSync(savePath, htmlCode);
-							shell.openItem(savePath);
-						}
-						catch (e ) {
-							winDash.webContents.send("exportToFileError", e.code);
-						}
-						break;
+		const exportHandler = (type, format, data) => { 
+			const htmlFormat = () => {
+				const avgEvalsType = () => {
+					var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;} table, td, tr, th {text-align: center;color: #555;border-width: 2px;border-style: solid;}</style></head><body>";
+					htmlCode += data;
+					htmlCode += "</body></html>";
+					try  {
+						fs.writeFileSync(savePath, htmlCode);
+						shell.openItem(savePath);
 					}
-
-					case "timetable": {
-								var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;} table, td, tr, th {text-align: center;color: #555;border-width: 2px;border-style: solid;}</style></head><body>";
-								htmlCode += exportData;
-								htmlCode += "</body></html>"
-								try  {
-									fs.writeFileSync(savePath, htmlCode);
-									shell.openItem(savePath);
-								}
-								catch (e ) {
-									winDash.webContents.send("exportToFileError", e.code);
-								}
-
-								break;
-							}
+					catch (e ) {
+						winDash.webContents.send("exportToFileError", e.code);
 					}
-				}
-				break;
-			}
+        		}
+        		const timetableType = () => {
+					var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;} table, td, tr, th {text-align: center;color: #555;border-width: 2px;border-style: solid;}</style></head><body>";
+					htmlCode += data;
+					htmlCode += "</body></html>"
+					try  {
+						fs.writeFileSync(savePath, htmlCode);
+						shell.openItem(savePath);
+					}
+					catch (e ) {
+						winDash.webContents.send("exportToFileError", e.code);
+					}
+       	 		}
+				const types = {
+					avgEvals: avgEvalsType,
+					timetable: timetableType,
+					default: () => 'error'
+				};	
+				types[type]();
+			};
+
+			const formats = {
+				html: htmlFormat,
+				default: () => 'error'
+			};
+			formats[format]();
+		};
+		exportHandler (exportType, exportFormat, exportData)
 	});
 }
 
