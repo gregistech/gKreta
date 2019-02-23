@@ -18,6 +18,7 @@
         "timetable": "Timetable",
         "absences": "Absences",
         "notes": "Notes",
+        "export": "Export",
         "settings": "Settings",
 
         "total_number_of": "You have a total number of",
@@ -25,7 +26,7 @@
         "from_this": "From this",
         "evals_are": "evaluations are",
         "and": "and",
-        "text_evals_info": "evaluations are text, diligence or deportment evaluations.",
+        "text_evals_info": "evaluations are text, or other forms of evaluations.",
         "lowercase_abs": "absences",        
         "w_justified": "were justified",        
         "but": "but",
@@ -43,7 +44,11 @@
         "friday": "Friday",   
         "saturday": "Saturday",   
         "sunday": "Sunday",
-        
+
+        "pExport": "Export...",
+        "pToA": "...to a(n)...",
+        "pFile": "...file.",
+
         "language": "Language",
         "en": "English",
         "hu": "Hungarian",

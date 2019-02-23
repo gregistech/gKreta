@@ -39,6 +39,7 @@
                 <a onclick="onNavClick('Timetable')"><script>document.write(locale["timetable"])</script></a>
                 <a onclick="onNavClick('Absences')"><script>document.write(locale["absences"])</script></a>
                 <a onclick="onNavClick('Notes')"><script>document.write(locale["notes"])</script></a>
+                <a onclick="onNavClick('Export')"><script>document.write(locale["export"])</script></a>
                 <a onclick="onNavClick('Settings')"><script>document.write(locale["settings"])</script></a>
         </div>
         <div id="content">  
@@ -114,6 +115,10 @@
                             }
                             case "Notes": {
                                 tabLocalized = locale["notes"];
+                                break;
+                            }
+                            case "Export": {
+                                tabLocalized = locale["export"];
                                 break;
                             }
                             case "Settings": {
@@ -329,10 +334,58 @@
                     ipc.send("openExternalLink", link);
                 }
 
+                function exportToFile() {
+                    exportType = $("#sExportType").val();
+                    exportFormat = $("#sExportFormat").val();
+                    switch(exportType) {
+                        case "avgEvals": {
+                            var exportData = studentData.SubjectAverages;         
+                            break;
+                        }
+                        case "timetable": {
+                            var exportData = "";
+                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
+
+                            var lessonRows = new Array();
+
+                            var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
+                            var daysOffset = 0;
+                            var currentMonday = getMonday(new Date());
+                            for (i = 0; i < 7;i++) {
+                                var currentDay = addDays(currentMonday, daysOffset)
+                                for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                    var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
+                                    if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
+                                        daysAndLessons[i][timetableData[j].Count] = timetableData[j].Subject;
+                                    }
+                                }
+                                daysOffset++;
+                            }
+
+                            for (i = 0; i < 10;i++) {
+                                lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
+                                lessonRows[i].appendTo(timetableTable);
+                                $("<td>" + (i + 1) + ".</td>").appendTo(lessonRows[i]);
+
+                                for (j = 0; j < 7; j++) {
+                                    var currentLesson = daysAndLessons[j][i+1];
+                                    if (currentLesson === undefined)
+                                        $("<td> --- </td>").appendTo(lessonRows[i]);
+                                    else
+                                        $("<td>" + currentLesson + "</td>").appendTo(lessonRows[i]);
+                                }
+                            }
+                            exportData = timetableTable.html();
+                            break;
+                        }        
+                    }
+                    ipc.send("exportToFile", exportType, exportFormat, exportData);
+                }
+
                 function displayTab(tab) {
                     currentTab = tab;
                     switch(tab) {
-                        case "Dashboard": {
+                        case  "Dashboard": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["dashboard"] + "</h2>");
 
@@ -411,7 +464,7 @@
                             break;
                         }
                         
-                        case "Evaluations": {
+                        case  "Evaluations": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["evals"] + "</h2>");
                             var evals = studentData.Evaluations;   
@@ -486,14 +539,14 @@
                             break;
                         }
 
-                        case "Timetable": {
+                        case  "Timetable": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["timetable"] + "</h2>");
                             generateDiv("timetable");
                             break;
                         }
 
-                        case "Absences": {
+                        case  "Absences": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["absences"] + "</h2>");
                             var absences = studentData.Absences;   
@@ -538,7 +591,7 @@
                             break;
                         }
 
-                        case "Notes": {
+                        case  "Notes": {
                             $("#tabDiv").empty();
                             $("#tabDiv").html("<h2>" + locale["notes"] + "</h2>");
                             var notes = studentData.Notes;   
@@ -552,6 +605,34 @@
                                 var bCurrentNoteTeacher = $("<b> -" + notes[i].Teacher + "</b>");
                                 bCurrentNoteTeacher.appendTo("#tabDiv");
                             }   
+                            break;
+                        }
+
+                        case  "Export":{
+                            $("#tabDiv").empty();
+                            $("#tabDiv").html("<h2>" + locale["export"] + "</h2>");
+
+                            var pExport =  $("<p>" +  locale["pExport"] + "</p>");
+                            pExport.appendTo("#tabDiv");
+                            var sExportType = $('<select id="sExportType"></select>');
+                            sExportType.appendTo("#tabDiv");
+                            var sExportTypeAvgEvals= $("<option value='avgEvals' selected>" + locale["current_avgs"] +"</option>");
+                            sExportTypeAvgEvals.appendTo(sExportType);
+                            var sExportTypeTimetable= $("<option value='timetable'>" + locale["timetable"] +"</option>");
+                            sExportTypeTimetable.appendTo(sExportType);
+
+                            var pToA =  $("<p>" + locale["pToA"] + "</p>");
+                            pToA.appendTo("#tabDiv");
+                            var sExportFormat = $('<select id="sExportFormat"/>');
+                            sExportFormat.appendTo("#tabDiv");
+                            var sExportFormatHTML = $("<option value='html'>HTML</option>");
+                            sExportFormatHTML.appendTo(sExportFormat);
+                            var pFile =  $("<p>" +  locale["pFile"] +"</p>");
+                            pFile.appendTo("#tabDiv");
+
+                            var bExport= $("<input type='button' onclick='exportToFile()' value='" + locale["export"] +"!' />");
+                            bExport.appendTo("#tabDiv");
+
                             break;
                         }
 

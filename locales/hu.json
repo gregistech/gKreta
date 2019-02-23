@@ -18,6 +18,7 @@
         "timetable": "Órarend",
         "absences": "Hiányzások",
         "notes": "Jegyzetek",
+        "export": "Exportálás",
         "settings": "Beállítások",
 
         "total_number_of": "Összesen",
@@ -44,10 +45,13 @@
         "saturday": "Szombat",   
         "sunday": "Vasárnap",
         
+        "pExport": "Kiszeretném exportálni a...",
+        "pToA": "...egy...",
+        "pFile": "...fáljba.",
+
         "language": "Nyelv",
         "en": "Angol",
         "hu": "Magyar",
-
         "encryption": "Titkosítás",
         "yes": "Igen",
         "no": "Nem",
