@@ -339,9 +339,51 @@
                     exportFormat = $("#sExportFormat").val();
                     switch(exportType) {
                         case "avgEvals": {
-                            var exportData = studentData.SubjectAverages;         
+                            var exportData = "";
+                            var avgTable = $("<table id='timetableTable' style='width: 100%;'><th>" + locale["subject"] + "</th><th>" + locale["your_avg"] + "</th><th>" + locale["class_avg"] + "</th><th>" + locale["diff"] + "</th></tr></table>");
+
+                            var subjects = new Array();
+                            var subjectRow = new Array();
+
+                            for(let i = 0; i < Object.keys(studentData.SubjectAverages).length; i++) {
+                                var currentSub = studentData.SubjectAverages[i].Subject;
+                                if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
+                                    subjects.push(currentSub);
+                                }
+                            }
+
+                            for (i = 0; i < Object.keys(subjects).length;i++) {
+                                subjectRow[i] = $("<tr id='rowTr" + i + "'></tr>");
+                                subjectRow[i].appendTo(avgTable);
+
+                                for (j = 0; j < 4; j++) {
+                                    switch(j) {
+                                        case 0: {
+                                            var currentData = studentData.SubjectAverages[i].Subject;
+                                            break;
+                                        }
+                                        case 1: {
+                                            var currentData = studentData.SubjectAverages[i].Value;
+                                            break;
+                                        }
+                                        case 2: {
+                                            var currentData = studentData.SubjectAverages[i].ClassValue;
+                                            break;
+                                        }                                        
+                                        case 3: {
+                                            var currentData = studentData.SubjectAverages[i].Difference;
+                                            break;
+                                        }
+                                    }
+                                    $("<td>" + currentData + "</td>").appendTo(subjectRow[i]);
+                                }
+                            }
+                            exportData = avgTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
+                            exportData = exportData.replace("</tbody>", "</table>");
+                            
                             break;
                         }
+
                         case "timetable": {
                             var exportData = "";
                             var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
@@ -361,7 +403,7 @@
                                 }
                                 daysOffset++;
                             }
-
+                            
                             for (i = 0; i < 10;i++) {
                                 lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
                                 lessonRows[i].appendTo(timetableTable);
@@ -375,7 +417,8 @@
                                         $("<td>" + currentLesson + "</td>").appendTo(lessonRows[i]);
                                 }
                             }
-                            exportData = timetableTable.html();
+                            exportData = timetableTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
+                            exportData = exportData.replace("</tbody>", "</table>");
                             break;
                         }        
                     }

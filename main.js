@@ -104,30 +104,9 @@ function startApplication () {
 			case "html": {
 				switch (exportType) {
 					case  "avgEvals": {
-						var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;}</style></head><body>";
-						for (i = 0; i < Object.keys(exportData).length;i++) {
-							var currentEvalValue = exportData[i].Value;
-							if (currentEvalValue !== 0) {
-								if (currentEvalValue === 5) {
-										var evalColor = "#03a338";
-								} else if (currentEvalValue < 5 || currentEvalValue >= 4.5) {
-									var evalColor = "#a1ff5e";
-								} else if (currentEvalValue < 4.5 || currentEvalValue >= 3.5) {
-									var evalColor  = "#bed300";
-								} else if (currentEvalValue < 3.5 || currentEvalValue >= 2.5) {
-									var evalColor = "#ed5300";
-								} else if (currentEvalValue < 2.5 || currentEvalValue >= 1.5) {
-									var evalColor  = "#ff0202";
-								} else if (currentEvalValue < 1.5 || currentEvalValue >= 2.5) {
-									var evalColor  = "#820000";
-								} else {
-									var evalColor  = "#820000";
-								}
-							}
-
-							htmlCode +=  "<p>" + exportData[i].Subject + " :  <span style='color: " + evalColor + ";'>" + currentEvalValue + "</p>";
-						}
-						htmlCode += "</body></html>"
+						var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;} table, td, tr, th {text-align: center;color: #555;border-width: 2px;border-style: solid;}</style></head><body>";
+						htmlCode += exportData;
+						htmlCode += "</body></html>";
 						try  {
 							fs.writeFileSync(savePath, htmlCode);
 							shell.openItem(savePath);
@@ -142,8 +121,6 @@ function startApplication () {
 								var htmlCode = "<html><head><style>html {background-color: #1c1c1c;color: #555;font-family: 'Ubuntu', sans-serif;} table, td, tr, th {text-align: center;color: #555;border-width: 2px;border-style: solid;}</style></head><body>";
 								htmlCode += exportData;
 								htmlCode += "</body></html>"
-								htmlCode = htmlCode.replace("<tbody>", "<table style='width: 100%; height:100%'>");
-								htmlCode = htmlCode.replace("</tbody>", "</table>");
 								try  {
 									fs.writeFileSync(savePath, htmlCode);
 									shell.openItem(savePath);

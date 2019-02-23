@@ -48,6 +48,10 @@
         "pExport": "Kiszeretném exportálni a...",
         "pToA": "...egy...",
         "pFile": "...fáljba.",
+        "subject": "Tantárgy",
+        "your_avg": "Átlagod",
+        "class_avg": "Oszt. átlag",
+        "diff": "Különb.",
 
         "language": "Nyelv",
         "en": "Angol",

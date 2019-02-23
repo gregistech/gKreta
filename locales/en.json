@@ -48,6 +48,10 @@
         "pExport": "Export...",
         "pToA": "...to a(n)...",
         "pFile": "...file.",
+        "subject": "Subject",
+        "your_avg": "Your avg.",
+        "class_avg": "Class avg.",
+        "diff": "Diff.",
 
         "language": "Language",
         "en": "English",
