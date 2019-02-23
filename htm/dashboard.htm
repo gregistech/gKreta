@@ -95,39 +95,23 @@
                
                 function onNavClick(tab) {
                     if (!loading) {
-                        var tabLocalized = "";
-                        switch(tab) {
-                            case "Dashboard": {
-                                tabLocalized = locale["dashboard"];
-                                break;
-                            }
-                            case "Evaluations": {
-                                tabLocalized = locale["evals"];
-                                break;
-                            }
-                            case "Timetable": {
-                                tabLocalized = locale["timetable"];
-                                break;
-                            }
-                            case "Absences": {
-                                tabLocalized = locale["absences"];
-                                break;
-                            }
-                            case "Notes": {
-                                tabLocalized = locale["notes"];
-                                break;
-                            }
-                            case "Export": {
-                                tabLocalized = locale["export"];
-                                break;
-                            }
-                            case "Settings": {
-                                tabLocalized = locale["settings"];
-                                break;
-                            }
-                        }
+                        const getLocalizedTab =  tab => {
+                            const tabNames =  {
+                                Dashboard: () => locale["dashboard"],
+                                Evaluations:  () => locale["evals"],
+                                Timetable: () => locale["timetable"],
+                                Absences: () => locale["absences"],
+                                Notes: () => locale["notes"],
+                                Export: () => locale["export"],
+                                Settings:  () => locale["settings"],
+                                default: () => ""
+                            };
 
+                            return (tabNames[tab] || tabNames.default)();
+                        };
+                        var  tabLocalized = getLocalizedTab(tab);
                         document.title = "gKréta - " + tabLocalized;
+                        
                         $('#title').empty();
                         $('#title').html(document.title);
 
@@ -151,146 +135,122 @@
                 }
 
                 function generateDiv(divName, other_args) {
-                    switch (divName) {
-                        case "nextLesson": {
-                            //TODO
-                        }
-                        case "evals": {
-                            var evalDiv = $("<div style='display: inline-block; vertical-align: top;;margin: 10px;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
-                            evalDiv.appendTo("#tabDiv");
-                            var evalH3 = $("<h3>" + locale["evals"] + "</h3>");
-                            evalH3.appendTo("#evalDiv");
-                            var allEvalsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["evaluations"] +".</p>");
-                            allEvalsP.appendTo("#evalDiv");
-                            var evals5P = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[5] + " " + locale["evals_are"] + " 5,</p>");
-                            evals5P.appendTo("#evalDiv");
-                            var evals4P = $("<p style='color: #bed300;'>" + other_args[4] + " " + locale["evals_are"] + " 4,</p>");
-                            evals4P.appendTo("#evalDiv");
-                            var evals3P = $("<p style='color: #ed5300;'>" + other_args[3] + " " + locale["evals_are"] + " 3,</p>");
-                            evals3P.appendTo("#evalDiv");
-                            var evals2P = $("<p style='color: #ff0202;'>" + other_args[2] + " " + locale["evals_are"] + " 2,</p>");
-                            evals2P.appendTo("#evalDiv");
-                            var evals1P = $("<p style='color: #820000;'>" + locale["and"] + " " + other_args[1] + " " + locale["evals_are"] + " 1.</p>");
-                            evals1P.appendTo("#evalDiv");
-                            var evalsTextP = $("<p>" + other_args[6] + " " + locale["text_evals_info"] + "</p>");
-                            evalsTextP.appendTo("#evalDiv");
-                            break;
-                        }
-                        case "halfyear": {
-                            var halfyearDiv = $("<div style='display: inline-block; margin: 10px; vertical-align: top; border-width: 2px;border-style: solid;border-color: #555;' id='halfyearDiv' />");
-                            halfyearDiv.appendTo("#tabDiv");
-                            var halfyearH3 = $("<h3>" + locale["current_avgs"] + "</h3>");
-                            halfyearH3.appendTo("#halfyearDiv");
-                            var evalCount = 0;
-                            for (i = 0; i < Object.keys(other_args).length; i++) {
-                                if (other_args[i].Value !== 0) {
-                                    if (other_args[i].Value === 5) {
-                                        currentHalfYearEvalColor = "#03a338";
-                                    } else if (other_args[i].Value < 5 || other_args[i].Value >= 4.5) {
-                                        currentHalfYearEvalColor = "#a1ff5e";
-                                    } else if (other_args[i].Value < 4.5 || other_args[i].Value >= 3.5) {
-                                        currentHalfYearEvalColor = "#bed300";
-                                    } else if (other_args[i].Value < 3.5 || other_args[i].Value >= 2.5) {
-                                        currentHalfYearEvalColor = "#ed5300";
-                                    } else if (other_args[i].Value < 2.5 || other_args[i].Value >= 1.5) {
-                                        currentHalfYearEvalColor = "#ff0202";
-                                    } else if (other_args[i].Value < 1.5 || other_args[i].Value >= 2.5) {
-                                        currentHalfYearEvalColor = "#820000";
-                                    } else {
-                                        currentHalfYearEvalColor = "#820000";
-                                    }
-                                    
-                                    var currentHalfYearEval = $("<p>" + other_args[i].Subject + ": <span style='color: " + currentHalfYearEvalColor + ";'> " + other_args[i].Value + "</span></p>");
-                                    currentHalfYearEval.appendTo("#halfyearDiv");
-                                    evalCount++;
-                                }
-                            }
-
-                            break;
-                        }
-                        case "absences": {
-                            var absDiv = $("<div style='display: inline-block;margin: 10px; vertical-align: top;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
-                            absDiv.appendTo("#tabDiv");
-                            var absH3 = $("<h3>" + locale["absences"] + "</h3>");
-                            absH3.appendTo("#absDiv");
-                            var allAbsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["lowercase_abs"] + ".</p>");  
-                            allAbsP.appendTo("#absDiv");
-                            var justifiedAbsP = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[1] + " " + locale["w_justified"] + ",</p>");
-                            justifiedAbsP.appendTo("#absDiv");
-                            var beJustifiedAbsP = $("<p style='color: #ff0202;'>" + locale["but"] + " " + other_args[2] + " " + locale["need_justify"] +".</p>");
-                            beJustifiedAbsP.appendTo("#absDiv");
-                            var medicalAbsP = $("<p style='color: #0290c9;'>" + locale["you_have"] + " " + other_args[3] + " " + locale["justified_by_doctor"] +".</p>");
-                            medicalAbsP.appendTo("#absDiv");
-                            break;
-                        }
-                        case "timetable": {
-                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
-                            timetableTable.appendTo("#tabDiv");
-
-                            var lessonRows = new Array();
-
-                            var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
-                            var daysOffset = 0;
-                            var currentMonday = getMonday(new Date());
-                            for (i = 0; i < 7;i++) {
-                                var currentDay = addDays(currentMonday, daysOffset)
-                                for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                    var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
-                                    if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
-                                        daysAndLessons[i][timetableData[j].Count] = timetableData[j].Subject;
+                    const generateNewDiv = () => {
+                        const divs = {
+                            evals: () => {
+                                var evalDiv = $("<div style='display: inline-block; vertical-align: top;;margin: 10px;border-width: 2px;border-style: solid;border-color: #555;' id='evalDiv' />");
+                                evalDiv.appendTo("#tabDiv");
+                                var evalH3 = $("<h3>" + locale["evals"] + "</h3>");
+                                evalH3.appendTo("#evalDiv");
+                                var allEvalsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["evaluations"] +".</p>");
+                                allEvalsP.appendTo("#evalDiv");
+                                var evals5P = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[5] + " " + locale["evals_are"] + " 5,</p>");
+                                evals5P.appendTo("#evalDiv");
+                                var evals4P = $("<p style='color: #bed300;'>" + other_args[4] + " " + locale["evals_are"] + " 4,</p>");
+                                evals4P.appendTo("#evalDiv");
+                                var evals3P = $("<p style='color: #ed5300;'>" + other_args[3] + " " + locale["evals_are"] + " 3,</p>");
+                                evals3P.appendTo("#evalDiv");
+                                var evals2P = $("<p style='color: #ff0202;'>" + other_args[2] + " " + locale["evals_are"] + " 2,</p>");
+                                evals2P.appendTo("#evalDiv");
+                                var evals1P = $("<p style='color: #820000;'>" + locale["and"] + " " + other_args[1] + " " + locale["evals_are"] + " 1.</p>");
+                                evals1P.appendTo("#evalDiv");
+                                var evalsTextP = $("<p>" + other_args[6] + " " + locale["text_evals_info"] + "</p>");
+                                evalsTextP.appendTo("#evalDiv");
+                            },
+                            halfyear: () => {
+                                var halfyearDiv = $("<div style='display: inline-block; margin: 10px; vertical-align: top; border-width: 2px;border-style: solid;border-color: #555;' id='halfyearDiv' />");
+                                halfyearDiv.appendTo("#tabDiv");
+                                var halfyearH3 = $("<h3>" + locale["current_avgs"] + "</h3>");
+                                halfyearH3.appendTo("#halfyearDiv");
+                                var evalCount = 0;
+                                for (i = 0; i < Object.keys(other_args).length; i++) {
+                                    if (other_args[i].Value !== 0) {
+                                        if (other_args[i].Value === 5) {
+                                            currentHalfYearEvalColor = "#03a338";
+                                        } else if (other_args[i].Value < 5 || other_args[i].Value >= 4.5) {
+                                            currentHalfYearEvalColor = "#a1ff5e";
+                                        } else if (other_args[i].Value < 4.5 || other_args[i].Value >= 3.5) {
+                                            currentHalfYearEvalColor = "#bed300";
+                                        } else if (other_args[i].Value < 3.5 || other_args[i].Value >= 2.5) {
+                                            currentHalfYearEvalColor = "#ed5300";
+                                        } else if (other_args[i].Value < 2.5 || other_args[i].Value >= 1.5) {
+                                            currentHalfYearEvalColor = "#ff0202";
+                                        } else if (other_args[i].Value < 1.5 || other_args[i].Value >= 2.5) {
+                                            currentHalfYearEvalColor = "#820000";
+                                        } else {
+                                            currentHalfYearEvalColor = "#820000";
+                                        }
+                                        
+                                        var currentHalfYearEval = $("<p>" + other_args[i].Subject + ": <span style='color: " + currentHalfYearEvalColor + ";'> " + other_args[i].Value + "</span></p>");
+                                        currentHalfYearEval.appendTo("#halfyearDiv");
+                                        evalCount++;
                                     }
                                 }
-                                daysOffset++;
-                            }
+                            },
+                            absences: () => {
+                                var absDiv = $("<div style='display: inline-block;margin: 10px; vertical-align: top;border-width: 2px;border-style: solid;border-color: #555;' id='absDiv' />");
+                                absDiv.appendTo("#tabDiv");
+                                var absH3 = $("<h3>" + locale["absences"] + "</h3>");
+                                absH3.appendTo("#absDiv");
+                                var allAbsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["lowercase_abs"] + ".</p>");  
+                                allAbsP.appendTo("#absDiv");
+                                var justifiedAbsP = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[1] + " " + locale["w_justified"] + ",</p>");
+                                justifiedAbsP.appendTo("#absDiv");
+                                var beJustifiedAbsP = $("<p style='color: #ff0202;'>" + locale["but"] + " " + other_args[2] + " " + locale["need_justify"] +".</p>");
+                                beJustifiedAbsP.appendTo("#absDiv");
+                                var medicalAbsP = $("<p style='color: #0290c9;'>" + locale["you_have"] + " " + other_args[3] + " " + locale["justified_by_doctor"] +".</p>");
+                                medicalAbsP.appendTo("#absDiv");
+                            },
+                            timetable: () => {
+                                var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
+                                timetableTable.appendTo("#tabDiv");
 
-                            var currentDay = new Date().getDay();
-                            switch (currentDay) {
-                                case 0: {
-                                    $("#sunday").css("color", "#ff0202");
-                                    break;
+                                var lessonRows = new Array();
+
+                                var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
+                                var daysOffset = 0;
+                                var currentMonday = getMonday(new Date());
+                                for (i = 0; i < 7;i++) {
+                                    var currentDay = addDays(currentMonday, daysOffset)
+                                    for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                        var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
+                                        if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
+                                            daysAndLessons[i][timetableData[j].Count] = timetableData[j].Subject;
+                                        }
+                                    }
+                                    daysOffset++;
                                 }
-                                case 1: {
-                                    $("#monday").css("color", "#ff0202");
-                                    break;
+                                const colorCurrentDay = currentDay => {
+                                    const days = {
+                                        0: () => $("#sunday").css("color", "#ff0202"),
+                                        1: () => $("#monday").css("color", "#ff0202"),
+                                        2: () => $("#tuesday").css("color", "#ff0202"),
+                                        3: () => $("#wednesday").css("color", "#ff0202"),
+                                        4: () => $("#thursday").css("color", "#ff0202"),
+                                        5: () => $("#friday").css("color", "#ff0202"),
+                                        6: () => $("#saturday").css("color", "#ff0202")
+                                    };
+                                    days[currentDay]();
                                 }
-                                case 2: {
-                                    $("#tuesday").css("color", "#ff0202");
-                                    break;
-                                }
-                                case 3: {
-                                    $("#wednesday").css("color", "#ff0202");
-                                    break;
-                                }
-                                case 4: {
-                                    $("#thursday").css("color", "#ff0202");
-                                    break;
-                                }
-                                case 5: {
-                                    $("#friday").css("color", "#ff0202");
-                                    break;
-                                }
-                                case 6: {
-                                    $("#saturday").css("color", "#ff0202");
-                                    break;
+                                colorCurrentDay(new Date().getDay());
+                                for (i = 0; i < 10;i++) {
+                                    lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
+                                    lessonRows[i].appendTo("#timetableTable");
+                                    $("<td>" + (i + 1) + ".</td>").appendTo("#rowTr" + i);
+
+                                    for (j = 0; j < 7; j++) {
+                                        var currentLesson = daysAndLessons[j][i+1];
+                                        if (currentLesson === undefined)
+                                            $("<td> --- </td>").appendTo("#rowTr" + i);
+                                        else
+                                            $("<td>" + currentLesson + "</td>").appendTo("#rowTr" + i);
+                                    }
                                 }
                             }
-
-                            for (i = 0; i < 10;i++) {
-                                lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
-                                lessonRows[i].appendTo("#timetableTable");
-                                $("<td>" + (i + 1) + ".</td>").appendTo("#rowTr" + i);
-
-                                for (j = 0; j < 7; j++) {
-                                    var currentLesson = daysAndLessons[j][i+1];
-                                    if (currentLesson === undefined)
-                                        $("<td> --- </td>").appendTo("#rowTr" + i);
-                                    else
-                                        $("<td>" + currentLesson + "</td>").appendTo("#rowTr" + i);
-                                }
-                            }
-                        }
-                        break;
-                    }
+                        };
+                        divs[divName]();
+                    };
+                    generateNewDiv();
                 }
 
                 function displayErrorTab(errorCode) {
@@ -299,22 +259,16 @@
                     var hr = $("<hr />")
                     var tabDiv = $("<div id='tabDiv' />")
                     var errorDescH2 = $("<h2>" + locale["error_faq_title"] + "<h2/>");
-                    switch (errorCode) {
-                        case 403: {
-                            var errorDesc = $("<p>" + locale["error_faq_403"] + "<p/>");
-                            break;
-                        }
-
-                        case 503: {
-                            var errorDesc = $("<p>" + locale["error_faq_503"] + "<p/>");
-                            break;
-                        }
-
-                        default: {
-                            var errorDesc = $("<p>" + locale["error_faq_unk"] + "<p/>");
-                            break;
-                        }
-                    }
+                    var errorDesc;
+                    const writeErrorDesc = errorCode => {
+                        const errors = {
+                            403: () =>  errorDesc = $("<p>" + locale["error_faq_403"] + "<p/>"),
+                            503: () =>  errorDesc = $("<p>" + locale["error_faq_503"] + "<p/>"),
+                            default: () =>  errorDesc = $("<p>" + locale["error_faq_unk"] + "<p/>")
+                        };
+                        errors[errorCode]();
+                    };
+                    writeErrorDesc();
                     h1Name.appendTo('#content');
                     hr.appendTo('#content');
                     tabDiv.appendTo('#content');
@@ -427,324 +381,272 @@
 
                 function displayTab(tab) {
                     currentTab = tab;
-                    switch(tab) {
-                        case  "Dashboard": {
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["dashboard"] + "</h2>");
+                    tab = (tab ===  "Evaluations") ?  "evals" : tab;
+                    $("#tabDiv").empty();
+                    $("#tabDiv").html("<h2>" + locale[tab.toLowerCase()] + "</h2>");
 
-                            var allEvals = 0;
-                            var evals5 = 0;
-                            var evals4 = 0;
-                            var evals3 = 0;
-                            var evals2 = 0;
-                            var evals1 = 0;
-                            var evalsText = 0;
-                            
-                            for(let i = 0; i < Object.keys(studentData.Evaluations).length; i++) {
-                                switch (studentData.Evaluations[i].NumberValue) {
-                                    case 5: {
-                                        evals5++;
-                                        break;
-                                    }
-                                    case 4: {
-                                        evals4++;
-                                        break;
-                                    }
-                                    case 3: {
-                                        evals3++;
-                                        break;
-                                    }
-                                    case 2: {
-                                        evals2++;
-                                        break;
-                                    }
-                                    case 1: {
-                                        evals1++;
-                                        break;
-                                    }
-                                    default: {
-                                        evalsText++;
-                                        break;
+                    const displayNewTab = tab => {
+                        const tabs = {
+                            Dashboard: () => { 
+                                var evalsDivArray = {
+                                    6: 0,
+                                    5: 0,
+                                    4: 0,
+                                    3: 0,
+                                    2: 0,
+                                    1: 0,
+                                    0: 0
+                                };
+                                const incrementCorrectEvalCount =  (evalValue) => {
+                                        const numbers = {
+                                            default: () => evalsDivArray[6]++,
+                                            5: () => evalsDivArray[5]++,
+                                            4: () => evalsDivArray[4]++,
+                                            3: () => evalsDivArray[3]++,
+                                            2: () => evalsDivArray[2]++,
+                                            1: () => evalsDivArray[1]++
+                                        };
+                                        (numbers[evalValue] || numbers.default)();
+                                    };
+                                for(let i = 0; i < Object.keys(studentData.Evaluations).length; i++) {
+                                    incrementCorrectEvalCount(studentData.Evaluations[i].NumberValue);
+                                }
+                                evalsDivArray[0] =  evalsDivArray[1] + evalsDivArray[2]+ evalsDivArray[3]+ evalsDivArray[4]+ evalsDivArray[5]+ evalsDivArray[6];
+
+                                var absenceDivArray = {
+                                    0: 0,
+                                    1: 0,
+                                    2: 0,
+                                    3: 0,
+                                }
+                                const incrementCorrectAbsenceCount =  (absenceType, absenceType2) => {
+                                        const absenceTypes = {
+                                            Justified: () => absenceDivArray[1]++,
+                                            BeJustified: () => absenceDivArray[2]++
+                                        };
+                                        if (absenceType2 === "Medical")
+                                            absenceDivArray[3]++;
+                                        (absenceTypes [absenceType])();
+                                    };
+                                for (i = 0; i < Object.keys(studentData.Absences).length; i++) {
+                                    incrementCorrectAbsenceCount(studentData.Absences[i].JustificationState, studentData.Absences[i].JustificationType);
+                                }
+                                absenceDivArray[0] = absenceDivArray[1] + absenceDivArray[2] + absenceDivArray[3];   
+
+                                generateDiv("halfyear", studentData.SubjectAverages);
+                                generateDiv("evals", evalsDivArray);
+                                generateDiv("absences", absenceDivArray);
+                            },
+                            evals: () => { //Refactored till this : thegergo02
+                                var evals = studentData.Evaluations;   
+                                var subjects = new Array();
+
+                                for(let i = 0; i < Object.keys(evals).length; i++) {
+                                    var currentSub = evals[i].Subject;
+                                    if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
+                                        subjects.push(currentSub);
                                     }
                                 }
-                                allEvals++;
-                            }
 
-                            var allAbsences = 0;
-                            var justifiedAbsences = 0;
-                            var beJustifiedAbsences = 0;
-                            var medicalAbsences = 0;
-                            for (i = 0; i < Object.keys(studentData.Absences).length; i++) {
-                                if (studentData.Absences[i].JustificationState === "Justified")
-                                {
-                                    justifiedAbsences++;
-                                } else if (studentData.Absences[i].JustificationState === "BeJustified") {
-                                    beJustifiedAbsences++;
+                                for (j = 0;j < Object.keys(subjects).length;j++) {
+                                    $("<h2 id='h2" + j + "'><b>" + capitalizeFirstLetter(subjects[j]) + "</b></h2>").appendTo("#tabDiv");
+                                    for (i = 0;i < Object.keys(evals).length;i++) {
+                                            if (evals[i].Form === "Mark") {
+                                                if (evals[i].Subject === subjects[j]) {
+                                                switch (evals[i].NumberValue) {
+                                                    case 5: {
+                                                        var evalColor = "#03a338";
+                                                        break;
+                                                    }
+                                                    case 4: {
+                                                        var evalColor = "#bed300";
+                                                        break;
+                                                    }
+                                                    case 3: {
+                                                        var evalColor = "#ed5300";
+                                                        break;
+                                                    }
+                                                    case 2: {
+                                                        var evalColor = "#ff0202";
+                                                        break;
+                                                    }
+                                                    case 1: {
+                                                        var evalColor = "#820000";
+                                                        break;
+                                                    }
+                                                    default: {
+                                                        var evalColor = "#820000";
+                                                        break;
+                                                    }
+                                                }
+                                                var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
+                                                if (evals[i].Type === "MidYear") {
+                                                    if (evals[i].Mode !== "" && evals[i].Mode !== null)
+                                                        currentEval += " | " + evals[i].Mode;
+
+                                                    if (evals[i].Theme !== "" && evals[i].Theme !== null)
+                                                        currentEval += " | " + evals[i].Theme;
+
+                                                    if (evals[i].Weight !== "" && evals[i].Weight !== null && evals[i].Weight !== "100%") {
+                                                        if (evals[i].Weight === "200%")
+                                                            currentEval += " | <span style='color: #ff0202;'>" + evals[i].Weight + "</span>";
+                                                        else 
+                                                            currentEval += " | <span style='color: #0290c9;'>" + evals[i].Weight + "</span>";
+                                                    }
+                                            
+                                                    currentEval = $(currentEval + "</p>");
+                                                    currentEval.appendTo("#tabDiv");
+                                                } else if (evals[i].Type === "HalfYear") {
+                                                    if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
+                                                        currentEval += " | " + evals[i].TypeName;
+
+                                                    currentEval = $(currentEval + "</p>");
+                                                    currentEval.appendTo("#tabDiv");
+                                                }
+                                            } else if (evals[i].Form === "Text") {
+                                                var currentEval  = "<p>" + evals[i].Value;
+                                                if (evals[i].Type === "MidYear") {
+                                                    if (evals[i].FormName !== "" && evals[i].FormName !== null)
+                                                        currentEval += " | " + evals[i].FormName;
+
+                                                    if (evals[i].Mode !== "" && evals[i].Mode !== null)
+                                                        currentEval += " | " + evals[i].Mode;
+
+                                                    if (evals[i].Theme !== "" && evals[i].Theme !== null)
+                                                        currentEval += " | " + evals[i].Theme;
+                                            
+                                                    currentEval = $(currentEval + "</p>");
+                                                    currentEval.appendTo("#tabDiv");
+                                                } else if (evals[i].Type === "HalfYear") {
+                                                    if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
+                                                        currentEval += " | " + evals[i].TypeName;
+
+                                                    currentEval = $(currentEval + "</p>");
+                                                    currentEval.appendTo("#tabDiv");
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                                if (studentData.Absences[i].JustificationType === "Medical")
-                                    medicalAbsences++;
-                                allAbsences++;
-                            }
+                            },
+                            Timetable: () => {
+                                generateDiv("timetable");
+                            },
+                            Absences: () => {
+                                var absences = studentData.Absences;   
+                                var dates = new Array();
 
-                            var evalsDivArray = new Array();
-                            evalsDivArray[0] = allEvals;
-                            evalsDivArray[5] = evals5;
-                            evalsDivArray[4] = evals4;
-                            evalsDivArray[3] = evals3;
-                            evalsDivArray[2] = evals2;
-                            evalsDivArray[1] = evals1;
-                            evalsDivArray[6] = evalsText;
-
-                            var absDivArray = new Array();
-                            absDivArray[0] = allAbsences;
-                            absDivArray[1] = justifiedAbsences;
-                            absDivArray[2] = beJustifiedAbsences;
-                            absDivArray[3] = medicalAbsences;
-
-                            generateDiv("halfyear", studentData.SubjectAverages);
-                            generateDiv("evals", evalsDivArray);
-                            generateDiv("absences", absDivArray);
-                            break;
-                        }
-                        
-                        case  "Evaluations": {
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["evals"] + "</h2>");
-                            var evals = studentData.Evaluations;   
-                            var subjects = new Array();
-
-                            for(let i = 0; i < Object.keys(evals).length; i++) {
-                                var currentSub = evals[i].Subject;
-                                if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
-                                    subjects.push(currentSub);
+                                for(let i = 0; i < Object.keys(absences).length; i++) {
+                                    var currentDate = absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T'));
+                                    if (dates.indexOf(currentDate) === -1 && currentDate !== null) {
+                                        dates.push(currentDate);
+                                    }
                                 }
-                            }
 
-                            for (j = 0;j < Object.keys(subjects).length;j++) {
-                                $("<h2 id='h2" + j + "'><b>" + capitalizeFirstLetter(subjects[j]) + "</b></h2>").appendTo("#tabDiv");
-                                for (i = 0;i < Object.keys(evals).length;i++) {
-                                        if (evals[i].Form === "Mark") {
-                                            if (evals[i].Subject === subjects[j]) {
-                                            switch (evals[i].NumberValue) {
-                                                case 5: {
-                                                    var evalColor = "#03a338";
+                                dates.sort(function(a, b) {
+                                    a = new Date(a);
+                                    b = new Date(b);
+                                    return a>b ? -1 : a<b ? 1 : 0;
+                                });
+
+                                for (j = 0;j < Object.keys(dates).length;j++) {
+                                    $("<h2 id='h2" + j + "'><b>" + dates[j] + "</b></h2>").appendTo("#tabDiv");
+                                    for (i = 0;i < Object.keys(absences).length;i++) {
+                                        if (absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T')) === dates[j]) {
+                                            switch (absences[i].JustificationState) {
+                                                case "BeJustified": {
+                                                    var absenceColor = "#ff0202";
                                                     break;
                                                 }
-                                                case 4: {
-                                                    var evalColor = "#bed300";
-                                                    break;
-                                                }
-                                                case 3: {
-                                                    var evalColor = "#ed5300";
-                                                    break;
-                                                }
-                                                case 2: {
-                                                    var evalColor = "#ff0202";
-                                                    break;
-                                                }
-                                                case 1: {
-                                                    var evalColor = "#820000";
+                                                case "Justified": {
+                                                    var absenceColor = "#03a338";
                                                     break;
                                                 }
                                                 default: {
-                                                    var evalColor = "#820000";
+                                                    var absenceColor = "#ff0202";
                                                     break;
                                                 }
                                             }
-                                            var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
-                                            if (evals[i].Type === "MidYear") {
-                                                if (evals[i].Mode !== "" && evals[i].Mode !== null)
-                                                    currentEval += " | " + evals[i].Mode;
+                                            var currentAbsence = $("<p style='color: " + absenceColor +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
+                                            currentAbsence.appendTo("#tabDiv"); 
+                                        } 
+                                    }
+                                }                          
+                            },
+                            Notes: () => {
+                                var notes = studentData.Notes;    
+                                for (i = 0; i < Object.keys(notes).length; i++) {
+                                    $("<hr/>").appendTo("#tabDiv");
+                                    var h3CurrentNoteTitle = $("<h3>" + notes[i].Title + "</h3>");
+                                    h3CurrentNoteTitle.appendTo("#tabDiv");
+                                    var pCurrentNoteContent = $("<p>" + notes[i].Content + "</p>");
+                                    pCurrentNoteContent.appendTo("#tabDiv");
+                                    var bCurrentNoteTeacher = $("<b> -" + notes[i].Teacher + "</b>");
+                                    bCurrentNoteTeacher.appendTo("#tabDiv");
+                                }   
+                            },
+                            Export: () => {
+                                var pExport =  $("<p>" +  locale["pExport"] + "</p>");
+                                pExport.appendTo("#tabDiv");
+                                var sExportType = $('<select id="sExportType"></select>');
+                                sExportType.appendTo("#tabDiv");
+                                var sExportTypeAvgEvals= $("<option value='avgEvals' selected>" + locale["current_avgs"] +"</option>");
+                                sExportTypeAvgEvals.appendTo(sExportType);
+                                var sExportTypeTimetable= $("<option value='timetable'>" + locale["timetable"] +"</option>");
+                                sExportTypeTimetable.appendTo(sExportType);
 
-                                                if (evals[i].Theme !== "" && evals[i].Theme !== null)
-                                                    currentEval += " | " + evals[i].Theme;
+                                var pToA =  $("<p>" + locale["pToA"] + "</p>");
+                                pToA.appendTo("#tabDiv");
+                                var sExportFormat = $('<select id="sExportFormat"/>');
+                                sExportFormat.appendTo("#tabDiv");
+                                var sExportFormatHTML = $("<option value='html'>HTML</option>");
+                                sExportFormatHTML.appendTo(sExportFormat);
+                                var pFile =  $("<p>" +  locale["pFile"] +"</p>");
+                                pFile.appendTo("#tabDiv");
 
-                                                if (evals[i].Weight !== "" && evals[i].Weight !== null && evals[i].Weight !== "100%") {
-                                                    if (evals[i].Weight === "200%")
-                                                        currentEval += " | <span style='color: #ff0202;'>" + evals[i].Weight + "</span>";
-                                                    else 
-                                                        currentEval += " | <span style='color: #0290c9;'>" + evals[i].Weight + "</span>";
-                                                }
-                                        
-                                                currentEval = $(currentEval + "</p>");
-                                                currentEval.appendTo("#tabDiv");
-                                            } else if (evals[i].Type === "HalfYear") {
-                                                if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
-                                                    currentEval += " | " + evals[i].TypeName;
-
-                                                currentEval = $(currentEval + "</p>");
-                                                currentEval.appendTo("#tabDiv");
-                                            }
-                                        } else if (evals[i].Form === "Text") {
-                                            var currentEval  = "<p>" + evals[i].Value;
-                                            if (evals[i].Type === "MidYear") {
-                                                if (evals[i].FormName !== "" && evals[i].FormName !== null)
-                                                    currentEval += " | " + evals[i].FormName;
-
-                                                if (evals[i].Mode !== "" && evals[i].Mode !== null)
-                                                    currentEval += " | " + evals[i].Mode;
-
-                                                if (evals[i].Theme !== "" && evals[i].Theme !== null)
-                                                    currentEval += " | " + evals[i].Theme;
-                                        
-                                                currentEval = $(currentEval + "</p>");
-                                                currentEval.appendTo("#tabDiv");
-                                            } else if (evals[i].Type === "HalfYear") {
-                                                if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
-                                                    currentEval += " | " + evals[i].TypeName;
-
-                                                currentEval = $(currentEval + "</p>");
-                                                currentEval.appendTo("#tabDiv");
-                                            }
-                                        }
+                                var bExport= $("<input type='button' onclick='exportToFile()' value='" + locale["export"] +"!' />");
+                                bExport.appendTo("#tabDiv");
+                            },
+                            Settings: () => {
+                                var languageSelected = new Array();
+                                switch (settings["locale"]) {
+                                    case "en": {
+                                        languageSelected[0] = " selected ";
+                                        languageSelected[1] = "";
+                                        break;
+                                    }
+                                    case "hu": {
+                                        languageSelected[0] = "";
+                                        languageSelected[1] = " selected ";
+                                        break;
                                     }
                                 }
-                            }
-                            break;
+
+                                var pLocale = $("<p>" + locale["language"] + ": </p>");
+                                pLocale.appendTo("#tabDiv");
+                                var sLocale = $('<select id="sLocale"/>');
+                                sLocale.appendTo("#tabDiv");
+                                var sLocaleEn = $('<option value="en"' + languageSelected[0] + '>' + locale["en"] + '</option>');
+                                sLocaleEn.appendTo("#sLocale");
+                                var sLocaleHu = $('<option value="hu"' + languageSelected[1] + '>' + locale["hu"] + '</option>');
+                                sLocaleHu.appendTo("#sLocale");
+
+                                $("<br />").appendTo("#tabDiv");
+
+                                var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
+                                bSaveSettings.appendTo("#tabDiv");
+
+                                var package = require("../package.json");
+                                var pVersion = $("<br /><br /><p>Your version: " + package["version"] + "</p>");
+                                pVersion.appendTo("#tabDiv");
+
+                                var linkToIcons8 = $("<br /><a style='color: #555;' href='#' onclick='openExternalLink(\"https://icons8.com\")'>Icons by Icons8</a>");
+                                linkToIcons8.appendTo("#tabDiv");
+                            },
                         }
-
-                        case  "Timetable": {
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["timetable"] + "</h2>");
-                            generateDiv("timetable");
-                            break;
-                        }
-
-                        case  "Absences": {
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["absences"] + "</h2>");
-                            var absences = studentData.Absences;   
-                            var dates = new Array();
-
-                            for(let i = 0; i < Object.keys(absences).length; i++) {
-                                var currentDate = absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T'));
-                                if (dates.indexOf(currentDate) === -1 && currentDate !== null) {
-                                    dates.push(currentDate);
-                                }
-                            }
-
-                            dates.sort(function(a, b) {
-                                a = new Date(a);
-                                b = new Date(b);
-                                return a>b ? -1 : a<b ? 1 : 0;
-                            });
-
-                            for (j = 0;j < Object.keys(dates).length;j++) {
-                                $("<h2 id='h2" + j + "'><b>" + dates[j] + "</b></h2>").appendTo("#tabDiv");
-                                for (i = 0;i < Object.keys(absences).length;i++) {
-                                    if (absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T')) === dates[j]) {
-                                        switch (absences[i].JustificationState) {
-                                            case "BeJustified": {
-                                                var absenceColor = "#ff0202";
-                                                break;
-                                            }
-                                            case "Justified": {
-                                                var absenceColor = "#03a338";
-                                                break;
-                                            }
-                                            default: {
-                                                var absenceColor = "#ff0202";
-                                                break;
-                                            }
-                                        }
-                                        var currentAbsence = $("<p style='color: " + absenceColor +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
-                                        currentAbsence.appendTo("#tabDiv"); 
-                                    } 
-                                }
-                            }                          
-                            break;
-                        }
-
-                        case  "Notes": {
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["notes"] + "</h2>");
-                            var notes = studentData.Notes;   
-                            
-                            for (i = 0; i < Object.keys(notes).length; i++) {
-                                $("<hr/>").appendTo("#tabDiv");
-                                var h3CurrentNoteTitle = $("<h3>" + notes[i].Title + "</h3>");
-                                h3CurrentNoteTitle.appendTo("#tabDiv");
-                                var pCurrentNoteContent = $("<p>" + notes[i].Content + "</p>");
-                                pCurrentNoteContent.appendTo("#tabDiv");
-                                var bCurrentNoteTeacher = $("<b> -" + notes[i].Teacher + "</b>");
-                                bCurrentNoteTeacher.appendTo("#tabDiv");
-                            }   
-                            break;
-                        }
-
-                        case  "Export":{
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["export"] + "</h2>");
-
-                            var pExport =  $("<p>" +  locale["pExport"] + "</p>");
-                            pExport.appendTo("#tabDiv");
-                            var sExportType = $('<select id="sExportType"></select>');
-                            sExportType.appendTo("#tabDiv");
-                            var sExportTypeAvgEvals= $("<option value='avgEvals' selected>" + locale["current_avgs"] +"</option>");
-                            sExportTypeAvgEvals.appendTo(sExportType);
-                            var sExportTypeTimetable= $("<option value='timetable'>" + locale["timetable"] +"</option>");
-                            sExportTypeTimetable.appendTo(sExportType);
-
-                            var pToA =  $("<p>" + locale["pToA"] + "</p>");
-                            pToA.appendTo("#tabDiv");
-                            var sExportFormat = $('<select id="sExportFormat"/>');
-                            sExportFormat.appendTo("#tabDiv");
-                            var sExportFormatHTML = $("<option value='html'>HTML</option>");
-                            sExportFormatHTML.appendTo(sExportFormat);
-                            var pFile =  $("<p>" +  locale["pFile"] +"</p>");
-                            pFile.appendTo("#tabDiv");
-
-                            var bExport= $("<input type='button' onclick='exportToFile()' value='" + locale["export"] +"!' />");
-                            bExport.appendTo("#tabDiv");
-
-                            break;
-                        }
-
-                        case "Settings": {
-                            $("#tabDiv").empty();
-                            $("#tabDiv").html("<h2>" + locale["settings"] + "</h2>");
-
-                            var languageSelected = new Array();
-                            switch (settings["locale"]) {
-                                case "en": {
-                                    languageSelected[0] = " selected ";
-                                    languageSelected[1] = "";
-                                    break;
-                                }
-                                case "hu": {
-                                    languageSelected[0] = "";
-                                    languageSelected[1] = " selected ";
-                                    break;
-                                }
-                            }
-
-                            var pLocale = $("<p>" + locale["language"] + ": </p>");
-                            pLocale.appendTo("#tabDiv");
-                            var sLocale = $('<select id="sLocale"/>');
-                            sLocale.appendTo("#tabDiv");
-                            var sLocaleEn = $('<option value="en"' + languageSelected[0] + '>' + locale["en"] + '</option>');
-                            sLocaleEn.appendTo("#sLocale");
-                            var sLocaleHu = $('<option value="hu"' + languageSelected[1] + '>' + locale["hu"] + '</option>');
-                            sLocaleHu.appendTo("#sLocale");
-
-                            $("<br />").appendTo("#tabDiv");
-
-                            var bSaveSettings = $("<input type='button' onclick='saveSettings()' value='" + locale["save_settings"] +"' />");
-                            bSaveSettings.appendTo("#tabDiv");
-
-                            var package = require("../package.json");
-                            var pVersion = $("<br /><br /><p>Your version: " + package["version"] + "</p>");
-                            pVersion.appendTo("#tabDiv");
-
-                            var linkToIcons8 = $("<br /><a style='color: #555;' href='#' onclick='openExternalLink(\"https://icons8.com\")'>Icons by Icons8</a>");
-                            linkToIcons8.appendTo("#tabDiv");
-                            break;
-                        }
-
-                        default: {
-                            break;
-                        }
+                        tabs[tab]();
                     }
+                    displayNewTab(tab);
                 }
             </script>
         </div>
