@@ -523,58 +523,79 @@
                             for (j = 0;j < Object.keys(subjects).length;j++) {
                                 $("<h2 id='h2" + j + "'><b>" + capitalizeFirstLetter(subjects[j]) + "</b></h2>").appendTo("#tabDiv");
                                 for (i = 0;i < Object.keys(evals).length;i++) {
-                                    if (evals[i].Subject === subjects[j]) {
-                                        switch (evals[i].NumberValue) {
-                                            case 5: {
-                                                var evalColor = "#03a338";
-                                                break;
+                                        if (evals[i].Form === "Mark") {
+                                            if (evals[i].Subject === subjects[j]) {
+                                            switch (evals[i].NumberValue) {
+                                                case 5: {
+                                                    var evalColor = "#03a338";
+                                                    break;
+                                                }
+                                                case 4: {
+                                                    var evalColor = "#bed300";
+                                                    break;
+                                                }
+                                                case 3: {
+                                                    var evalColor = "#ed5300";
+                                                    break;
+                                                }
+                                                case 2: {
+                                                    var evalColor = "#ff0202";
+                                                    break;
+                                                }
+                                                case 1: {
+                                                    var evalColor = "#820000";
+                                                    break;
+                                                }
+                                                default: {
+                                                    var evalColor = "#820000";
+                                                    break;
+                                                }
                                             }
-                                            case 4: {
-                                                var evalColor = "#bed300";
-                                                break;
-                                            }
-                                            case 3: {
-                                                var evalColor = "#ed5300";
-                                                break;
-                                            }
-                                            case 2: {
-                                                var evalColor = "#ff0202";
-                                                break;
-                                            }
-                                            case 1: {
-                                                var evalColor = "#820000";
-                                                break;
-                                            }
-                                            default: {
-                                                var evalColor = "#820000";
-                                                break;
-                                            }
-                                        }
+                                            var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
+                                            if (evals[i].Type === "MidYear") {
+                                                if (evals[i].Mode !== "" && evals[i].Mode !== null)
+                                                    currentEval += " | " + evals[i].Mode;
 
-                                        var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
+                                                if (evals[i].Theme !== "" && evals[i].Theme !== null)
+                                                    currentEval += " | " + evals[i].Theme;
+
+                                                if (evals[i].Weight !== "" && evals[i].Weight !== null && evals[i].Weight !== "100%") {
+                                                    if (evals[i].Weight === "200%")
+                                                        currentEval += " | <span style='color: #ff0202;'>" + evals[i].Weight + "</span>";
+                                                    else 
+                                                        currentEval += " | <span style='color: #0290c9;'>" + evals[i].Weight + "</span>";
+                                                }
                                         
-                                        if (evals[i].Type === "MidYear") {
-                                            if (evals[i].Mode !== "" && evals[i].Mode !== null)
-                                                currentEval += " | " + evals[i].Mode;
+                                                currentEval = $(currentEval + "</p>");
+                                                currentEval.appendTo("#tabDiv");
+                                            } else if (evals[i].Type === "HalfYear") {
+                                                if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
+                                                    currentEval += " | " + evals[i].TypeName;
 
-                                            if (evals[i].Theme !== "" && evals[i].Theme !== null)
-                                                currentEval += " | " + evals[i].Theme;
-
-                                            if (evals[i].Weight !== "" && evals[i].Weight !== null && evals[i].Weight !== "100%") {
-                                                if (evals[i].Weight === "200%")
-                                                    currentEval += " | <span style='color: #ff0202;'>" + evals[i].Weight + "</span>";
-                                                else 
-                                                    currentEval += " | <span style='color: #0290c9;'>" + evals[i].Weight + "</span>";
+                                                currentEval = $(currentEval + "</p>");
+                                                currentEval.appendTo("#tabDiv");
                                             }
-                                    
-                                            currentEval = $(currentEval + "</p>");
-                                            currentEval.appendTo("#tabDiv");
-                                        } else if (evals[i].Type === "HalfYear") {
-                                            if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
-                                                currentEval += " | " + evals[i].TypeName;
+                                        } else if (evals[i].Form === "Text") {
+                                            var currentEval  = "<p>" + evals[i].Value;
+                                            if (evals[i].Type === "MidYear") {
+                                                if (evals[i].FormName !== "" && evals[i].FormName !== null)
+                                                    currentEval += " | " + evals[i].FormName;
 
-                                            currentEval = $(currentEval + "</p>");
-                                            currentEval.appendTo("#tabDiv");
+                                                if (evals[i].Mode !== "" && evals[i].Mode !== null)
+                                                    currentEval += " | " + evals[i].Mode;
+
+                                                if (evals[i].Theme !== "" && evals[i].Theme !== null)
+                                                    currentEval += " | " + evals[i].Theme;
+                                        
+                                                currentEval = $(currentEval + "</p>");
+                                                currentEval.appendTo("#tabDiv");
+                                            } else if (evals[i].Type === "HalfYear") {
+                                                if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
+                                                    currentEval += " | " + evals[i].TypeName;
+
+                                                currentEval = $(currentEval + "</p>");
+                                                currentEval.appendTo("#tabDiv");
+                                            }
                                         }
                                     }
                                 }
