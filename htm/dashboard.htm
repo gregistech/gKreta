@@ -6,7 +6,7 @@
         var settings = "";
         var locale = "";
 
-        var ipc = require("electron").ipcRenderer;    
+        var ipc = require("electron").ipcRenderer;
         ipc.send("getSettings");
         ipc.once("getSettingsSuccess", (event, data) => {
             settings = data;
@@ -14,9 +14,9 @@
                 settings = "en";
             }
             locale = require("../locales/" + settings["locale"] + ".json")["dashboard.htm"];
-                
+
             document.title = "gKréta - " + locale["dashboard"];
-        });    
+        });
 
         </script>
         <link rel="stylesheet" type="text/css" href="../css/general-dark.css" />
@@ -42,7 +42,7 @@
                 <a onclick="onNavClick('Export')"><script>document.write(locale["export"])</script></a>
                 <a onclick="onNavClick('Settings')"><script>document.write(locale["settings"])</script></a>
         </div>
-        <div id="content">  
+        <div id="content">
             <script>
                 window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
 
@@ -74,7 +74,7 @@
                 });
 
                 ipc.on("getStudentDataError", function errorDataHandler(event, errorCode) {
-                    displayErrorTab(errorCode); 
+                    displayErrorTab(errorCode);
                 });
 
                 function setupFirstWindow() {
@@ -92,7 +92,7 @@
                 function capitalizeFirstLetter(string) {
                     return string.charAt(0).toUpperCase() + string.slice(1);
                 }
-               
+
                 function onNavClick(tab) {
                     if (!loading) {
                         const getLocalizedTab =  tab => {
@@ -111,7 +111,7 @@
                         };
                         var  tabLocalized = getLocalizedTab(tab);
                         document.title = "gKréta - " + tabLocalized;
-                        
+
                         $('#title').empty();
                         $('#title').html(document.title);
 
@@ -180,7 +180,7 @@
                                         } else {
                                             currentHalfYearEvalColor = "#820000";
                                         }
-                                        
+
                                         var currentHalfYearEval = $("<p>" + other_args[i].Subject + ": <span style='color: " + currentHalfYearEvalColor + ";'> " + other_args[i].Value + "</span></p>");
                                         currentHalfYearEval.appendTo("#halfyearDiv");
                                         evalCount++;
@@ -192,7 +192,7 @@
                                 absDiv.appendTo("#tabDiv");
                                 var absH3 = $("<h3>" + locale["absences"] + "</h3>");
                                 absH3.appendTo("#absDiv");
-                                var allAbsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["lowercase_abs"] + ".</p>");  
+                                var allAbsP = $("<p>" + locale["total_number_of"] + " " + other_args[0] + " " + locale["lowercase_abs"] + ".</p>");
                                 allAbsP.appendTo("#absDiv");
                                 var justifiedAbsP = $("<p style='color: #03a338;'>" + locale["from_this"] + " " + other_args[1] + " " + locale["w_justified"] + ",</p>");
                                 justifiedAbsP.appendTo("#absDiv");
@@ -323,7 +323,7 @@
                                         case 2: {
                                             var currentData = studentData.SubjectAverages[i].ClassValue;
                                             break;
-                                        }                                        
+                                        }
                                         case 3: {
                                             var currentData = studentData.SubjectAverages[i].Difference;
                                             break;
@@ -334,7 +334,7 @@
                             }
                             exportData = avgTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
                             exportData = exportData.replace("</tbody>", "</table>");
-                            
+
                             break;
                         }
 
@@ -357,7 +357,7 @@
                                 }
                                 daysOffset++;
                             }
-                            
+
                             for (i = 0; i < 10;i++) {
                                 lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
                                 lessonRows[i].appendTo(timetableTable);
@@ -374,7 +374,7 @@
                             exportData = timetableTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
                             exportData = exportData.replace("</tbody>", "</table>");
                             break;
-                        }        
+                        }
                     }
                     ipc.send("exportToFile", exportType, exportFormat, exportData);
                 }
@@ -387,7 +387,7 @@
 
                     const displayNewTab = tab => {
                         const tabs = {
-                            Dashboard: () => { 
+                            Dashboard: () => {
                                 var evalsDivArray = {
                                     6: 0,
                                     5: 0,
@@ -431,14 +431,14 @@
                                 for (i = 0; i < Object.keys(studentData.Absences).length; i++) {
                                     incrementCorrectAbsenceCount(studentData.Absences[i].JustificationState, studentData.Absences[i].JustificationType);
                                 }
-                                absenceDivArray[0] = absenceDivArray[1] + absenceDivArray[2] + absenceDivArray[3];   
+                                absenceDivArray[0] = absenceDivArray[1] + absenceDivArray[2] + absenceDivArray[3];
 
                                 generateDiv("halfyear", studentData.SubjectAverages);
                                 generateDiv("evals", evalsDivArray);
                                 generateDiv("absences", absenceDivArray);
                             },
-                            evals: () => { //Refactored till this : thegergo02
-                                var evals = studentData.Evaluations;   
+                            evals: () => {
+                                var evals = studentData.Evaluations;
                                 var subjects = new Array();
 
                                 for(let i = 0; i < Object.keys(evals).length; i++) {
@@ -447,85 +447,73 @@
                                         subjects.push(currentSub);
                                     }
                                 }
+                                const evaluationHandler = (eval) => {
+                                            const colors = {
+                                                5: () => "#03a338",
+                                                4: () => "#bed300",
+                                                3: () => "#ed5300",
+                                                2: () => "#ff0202",
+                                                1: () => "#820000"
+                                            };
+                                            eval.Color = (colors[eval.NumberValue] || colors[1])();
 
+                                            const forms = {
+                                                Mark: () => {
+                                                    const types = {
+                                                        MidYear: () => {
+                                                            if (eval.Mode !== "" && eval.Mode !== null)
+                                                                currentEval += " | " + eval.Mode;
+                                                            if (eval.Theme !== "" && evals.Theme !== null)
+                                                                currentEval += " | " + eval.Theme;
+                                                            if (eval.Weight !== "" && eval.Weight !== null && eval.Weight !== "100%") {
+                                                                if (eval.Weight === "200%")
+                                                                    currentEval += " | <span style='color: #ff0202;'>" + eval.Weight + "</span>";
+                                                                else
+                                                                    currentEval += " | <span style='color: #0290c9;'>" + eval.Weight + "</span>";
+                                                            }
+                                                            currentEval = $(currentEval + "</p>");
+                                                            currentEval.appendTo("#tabDiv");
+                                                        },
+                                                        HalfYear: () => {
+                                                            if (eval.TypeName !== "" && eval.TypeName !== null)
+                                                                currentEval += " | " + eval.TypeName;
+                                                            currentEval = $(currentEval + "</p>");
+                                                            currentEval.appendTo("#tabDiv");
+                                                        }
+                                                    };
+                                                    var currentEval = "<p><span id='spanEval" + i + "' style='color: " + eval.Color + ";'>" + eval.Value + "</span>";
+                                                    (types[eval.Type] || types[MidYear])();        
+                                                },
+                                                Text: () => {
+                                                    const types = {
+                                                        MidYear: () => {
+                                                            if (eval.FormName !== "" && eval.FormName !== null)
+                                                                currentEval += " | " + eval.FormName;
+                                                            if (eval.Mode !== "" && evals.Mode !== null)
+                                                                currentEval += " | " + eval.Mode;
+                                                            if (eval.Theme !== "" && eval.Theme !== null)
+                                                                currentEval += " | " + eval.Theme;
+                                                            currentEval = $(currentEval + "</p>");
+                                                            currentEval.appendTo("#tabDiv");
+                                                        },
+                                                        HalfYear: () => {
+                                                            if (eval.TypeName !== "" && eval.TypeName !== null)
+                                                                currentEval += " | " + eval.TypeName;
+                                                            currentEval = $(currentEval + "</p>");
+                                                            currentEval.appendTo("#tabDiv");
+                                                        }
+                                                    };
+                                                    var currentEval  = "<p>" + eval.Value;
+                                                    (types[eval.Type] || types[MidYear])();     
+                                                }
+                                            };
+                                            (forms[eval.Form] || forms[Mark])();
+                                        };
                                 for (j = 0;j < Object.keys(subjects).length;j++) {
                                     $("<h2 id='h2" + j + "'><b>" + capitalizeFirstLetter(subjects[j]) + "</b></h2>").appendTo("#tabDiv");
                                     for (i = 0;i < Object.keys(evals).length;i++) {
-                                            if (evals[i].Form === "Mark") {
-                                                if (evals[i].Subject === subjects[j]) {
-                                                switch (evals[i].NumberValue) {
-                                                    case 5: {
-                                                        var evalColor = "#03a338";
-                                                        break;
-                                                    }
-                                                    case 4: {
-                                                        var evalColor = "#bed300";
-                                                        break;
-                                                    }
-                                                    case 3: {
-                                                        var evalColor = "#ed5300";
-                                                        break;
-                                                    }
-                                                    case 2: {
-                                                        var evalColor = "#ff0202";
-                                                        break;
-                                                    }
-                                                    case 1: {
-                                                        var evalColor = "#820000";
-                                                        break;
-                                                    }
-                                                    default: {
-                                                        var evalColor = "#820000";
-                                                        break;
-                                                    }
-                                                }
-                                                var currentEval = "<p><span id='spanEval" + i + "' style='color: " + evalColor + ";'>" + evals[i].Value + "</span>"; 
-                                                if (evals[i].Type === "MidYear") {
-                                                    if (evals[i].Mode !== "" && evals[i].Mode !== null)
-                                                        currentEval += " | " + evals[i].Mode;
-
-                                                    if (evals[i].Theme !== "" && evals[i].Theme !== null)
-                                                        currentEval += " | " + evals[i].Theme;
-
-                                                    if (evals[i].Weight !== "" && evals[i].Weight !== null && evals[i].Weight !== "100%") {
-                                                        if (evals[i].Weight === "200%")
-                                                            currentEval += " | <span style='color: #ff0202;'>" + evals[i].Weight + "</span>";
-                                                        else 
-                                                            currentEval += " | <span style='color: #0290c9;'>" + evals[i].Weight + "</span>";
-                                                    }
-                                            
-                                                    currentEval = $(currentEval + "</p>");
-                                                    currentEval.appendTo("#tabDiv");
-                                                } else if (evals[i].Type === "HalfYear") {
-                                                    if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
-                                                        currentEval += " | " + evals[i].TypeName;
-
-                                                    currentEval = $(currentEval + "</p>");
-                                                    currentEval.appendTo("#tabDiv");
-                                                }
-                                            } else if (evals[i].Form === "Text") {
-                                                var currentEval  = "<p>" + evals[i].Value;
-                                                if (evals[i].Type === "MidYear") {
-                                                    if (evals[i].FormName !== "" && evals[i].FormName !== null)
-                                                        currentEval += " | " + evals[i].FormName;
-
-                                                    if (evals[i].Mode !== "" && evals[i].Mode !== null)
-                                                        currentEval += " | " + evals[i].Mode;
-
-                                                    if (evals[i].Theme !== "" && evals[i].Theme !== null)
-                                                        currentEval += " | " + evals[i].Theme;
-                                            
-                                                    currentEval = $(currentEval + "</p>");
-                                                    currentEval.appendTo("#tabDiv");
-                                                } else if (evals[i].Type === "HalfYear") {
-                                                    if (evals[i].TypeName !== "" && evals[i].TypeName !== null)
-                                                        currentEval += " | " + evals[i].TypeName;
-
-                                                    currentEval = $(currentEval + "</p>");
-                                                    currentEval.appendTo("#tabDiv");
-                                                }
-                                            }
-                                        }
+                                        if (evals[i].Subject === subjects[j]) 
+                                            evaluationHandler(evals[i]);
                                     }
                                 }
                             },
@@ -533,7 +521,7 @@
                                 generateDiv("timetable");
                             },
                             Absences: () => {
-                                var absences = studentData.Absences;   
+                                var absences = studentData.Absences;
                                 var dates = new Array();
 
                                 for(let i = 0; i < Object.keys(absences).length; i++) {
@@ -568,13 +556,13 @@
                                                 }
                                             }
                                             var currentAbsence = $("<p style='color: " + absenceColor +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
-                                            currentAbsence.appendTo("#tabDiv"); 
-                                        } 
+                                            currentAbsence.appendTo("#tabDiv");
+                                        }
                                     }
-                                }                          
+                                }
                             },
                             Notes: () => {
-                                var notes = studentData.Notes;    
+                                var notes = studentData.Notes;
                                 for (i = 0; i < Object.keys(notes).length; i++) {
                                     $("<hr/>").appendTo("#tabDiv");
                                     var h3CurrentNoteTitle = $("<h3>" + notes[i].Title + "</h3>");
@@ -583,7 +571,7 @@
                                     pCurrentNoteContent.appendTo("#tabDiv");
                                     var bCurrentNoteTeacher = $("<b> -" + notes[i].Teacher + "</b>");
                                     bCurrentNoteTeacher.appendTo("#tabDiv");
-                                }   
+                                }
                             },
                             Export: () => {
                                 var pExport =  $("<p>" +  locale["pExport"] + "</p>");
