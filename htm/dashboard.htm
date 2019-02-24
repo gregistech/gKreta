@@ -291,91 +291,84 @@
                 function exportToFile() {
                     exportType = $("#sExportType").val();
                     exportFormat = $("#sExportFormat").val();
-                    switch(exportType) {
-                        case "avgEvals": {
-                            var exportData = "";
-                            var avgTable = $("<table id='timetableTable' style='width: 100%;'><th>" + locale["subject"] + "</th><th>" + locale["your_avg"] + "</th><th>" + locale["class_avg"] + "</th><th>" + locale["diff"] + "</th></tr></table>");
-
-                            var subjects = new Array();
-                            var subjectRow = new Array();
-
-                            for(let i = 0; i < Object.keys(studentData.SubjectAverages).length; i++) {
-                                var currentSub = studentData.SubjectAverages[i].Subject;
-                                if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
-                                    subjects.push(currentSub);
-                                }
-                            }
-
-                            for (i = 0; i < Object.keys(subjects).length;i++) {
-                                subjectRow[i] = $("<tr id='rowTr" + i + "'></tr>");
-                                subjectRow[i].appendTo(avgTable);
-
-                                for (j = 0; j < 4; j++) {
-                                    switch(j) {
-                                        case 0: {
-                                            var currentData = studentData.SubjectAverages[i].Subject;
-                                            break;
+                    var exportData = "";
+                    const exportHandler = (exportType, exportFormat) => {
+                        const types = {
+                            avgEvals: () => {
+                                const formats = {
+                                    html:  () => {
+                                        var avgTable = $("<table id='timetableTable' style='width: 100%;'><th>" + locale["subject"] + "</th><th>" + locale["your_avg"] + "</th><th>" + locale["class_avg"] + "</th><th>" + locale["diff"] + "</th></tr></table>");
+                                        var subjects = new Array();
+                                        var subjectRow = new Array();
+                                        for(let i = 0; i < Object.keys(studentData.SubjectAverages).length; i++) {
+                                            var currentSub = studentData.SubjectAverages[i].Subject;
+                                            if (subjects.indexOf(currentSub) === -1 && currentSub !== null) {
+                                                subjects.push(currentSub);
+                                            }
                                         }
-                                        case 1: {
-                                            var currentData = studentData.SubjectAverages[i].Value;
-                                            break;
+                                        for (i = 0; i < Object.keys(subjects).length;i++) {
+                                            subjectRow[i] = $("<tr id='rowTr" + i + "'></tr>");
+                                            subjectRow[i].appendTo(avgTable);
+
+                                            for (j = 0; j < 4; j++) {
+                                                const getCurrentColumn = j => {
+                                                    const columns = {
+                                                        0: () => {var currentData = studentData.SubjectAverages[i].Subject;},
+                                                        1: () => {var currentData = studentData.SubjectAverages[i].Value;},
+                                                        2: () => {var currentData = studentData.SubjectAverages[i].ClassValue;},
+                                                        3: () => {var currentData = studentData.SubjectAverages[i].Difference;},
+                                                    };
+                                                    (columns[j] || columns[0])();
+                                                };
+                                                getCurrentColumn(j);
+                                                $("<td>" + currentData + "</td>").appendTo(subjectRow[i]);
+                                            }
                                         }
-                                        case 2: {
-                                            var currentData = studentData.SubjectAverages[i].ClassValue;
-                                            break;
-                                        }
-                                        case 3: {
-                                            var currentData = studentData.SubjectAverages[i].Difference;
-                                            break;
-                                        }
+                                        exportData = avgTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
+                                        exportData = exportData.replace("</tbody>", "</table>");
                                     }
-                                    $("<td>" + currentData + "</td>").appendTo(subjectRow[i]);
-                                }
-                            }
-                            exportData = avgTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
-                            exportData = exportData.replace("</tbody>", "</table>");
-
-                            break;
-                        }
-
-                        case "timetable": {
-                            var exportData = "";
-                            var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
-
-                            var lessonRows = new Array();
-
-                            var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
-                            var daysOffset = 0;
-                            var currentMonday = getMonday(new Date());
-                            for (i = 0; i < 7;i++) {
-                                var currentDay = addDays(currentMonday, daysOffset)
-                                for (j = 0; j < Object.keys(timetableData).length;j++) {
-                                    var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
-                                    if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
-                                        daysAndLessons[i][timetableData[j].Count] = timetableData[j].Subject;
+                                };
+                                (formats[exportFormat] || formats[html])();
+                            },
+                            timetable: () => {
+                                const formats = {
+                                    html:  () => {
+                                        var timetableTable = $("<table id='timetableTable' style='width: 100%;'><tr><th>" + locale["count"] + "</th><th><span id='monday'>" + locale["monday"] + "</span></th><th><span id='tuesday'>" + locale["tuesday"] + "</th><th><span id='wednesday'>" + locale["wednesday"] + "</span></th><th><span id='thursday'>" + locale["thursday"] + "</span></th><th><span id='friday'>" + locale["friday"] + "</span></th><th><span id='saturday'>" + locale["saturday"] + "</span></th><th><span id='sunday'>" + locale["sunday"] + "</span></th></tr></table>");
+                                        var lessonRows = new Array();
+                                        var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
+                                        var daysOffset = 0;
+                                        var currentMonday = getMonday(new Date());
+                                        for (i = 0; i < 7;i++) {
+                                            var currentDay = addDays(currentMonday, daysOffset)
+                                            for (j = 0; j < Object.keys(timetableData).length;j++) {
+                                                var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
+                                                if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
+                                                    daysAndLessons[i][timetableData[j].Count] = timetableData[j].Subject;
+                                                }
+                                            }
+                                            daysOffset++;
+                                        }
+                                        for (i = 0; i < 10;i++) {
+                                            lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
+                                            lessonRows[i].appendTo(timetableTable);
+                                            $("<td>" + (i + 1) + ".</td>").appendTo(lessonRows[i]);
+                                            for (j = 0; j < 7; j++) {
+                                                var currentLesson = daysAndLessons[j][i+1];
+                                                if (currentLesson === undefined)
+                                                    $("<td> --- </td>").appendTo(lessonRows[i]);
+                                                else
+                                                    $("<td>" + currentLesson + "</td>").appendTo(lessonRows[i]);
+                                            }
+                                        }
+                                        exportData = timetableTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
+                                        exportData = exportData.replace("</tbody>", "</table>");
                                     }
-                                }
-                                daysOffset++;
+                                };
+                                (formats[exportFormat] || formats[html])();
                             }
-
-                            for (i = 0; i < 10;i++) {
-                                lessonRows[i] = $("<tr id='rowTr" + i + "'></tr>");
-                                lessonRows[i].appendTo(timetableTable);
-                                $("<td>" + (i + 1) + ".</td>").appendTo(lessonRows[i]);
-
-                                for (j = 0; j < 7; j++) {
-                                    var currentLesson = daysAndLessons[j][i+1];
-                                    if (currentLesson === undefined)
-                                        $("<td> --- </td>").appendTo(lessonRows[i]);
-                                    else
-                                        $("<td>" + currentLesson + "</td>").appendTo(lessonRows[i]);
-                                }
-                            }
-                            exportData = timetableTable.html().replace("<tbody>", "<table style='width: 100%; height:100%'>");
-                            exportData = exportData.replace("</tbody>", "</table>");
-                            break;
-                        }
-                    }
+                        };
+                        (types[exportType] || types[avgEvals])();
+                    };
                     ipc.send("exportToFile", exportType, exportFormat, exportData);
                 }
 
@@ -530,32 +523,23 @@
                                         dates.push(currentDate);
                                     }
                                 }
-
                                 dates.sort(function(a, b) {
                                     a = new Date(a);
                                     b = new Date(b);
                                     return a>b ? -1 : a<b ? 1 : 0;
                                 });
-
                                 for (j = 0;j < Object.keys(dates).length;j++) {
                                     $("<h2 id='h2" + j + "'><b>" + dates[j] + "</b></h2>").appendTo("#tabDiv");
                                     for (i = 0;i < Object.keys(absences).length;i++) {
                                         if (absences[i].LessonStartTime.substring(0, absences[i].LessonStartTime.indexOf('T')) === dates[j]) {
-                                            switch (absences[i].JustificationState) {
-                                                case "BeJustified": {
-                                                    var absenceColor = "#ff0202";
-                                                    break;
-                                                }
-                                                case "Justified": {
-                                                    var absenceColor = "#03a338";
-                                                    break;
-                                                }
-                                                default: {
-                                                    var absenceColor = "#ff0202";
-                                                    break;
-                                                }
-                                            }
-                                            var currentAbsence = $("<p style='color: " + absenceColor +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
+                                            const getAbsenceColor = justificationState=> {
+                                                const colors = {
+                                                    BeJustified: () => "#ff0202",
+                                                    Justified: () => "#03a338",
+                                                };
+                                                return (colors[justificationState] || colors.BeJustified)();
+                                            };
+                                            var currentAbsence = $("<p style='color: " + getAbsenceColor(absences[i].JustificationState) +" ;'>" + absences[i].TypeName + " | " + absences[i].ModeName + " | " + absences[i].Subject + " (" + absences[i].JustificationStateName +")</p>");
                                             currentAbsence.appendTo("#tabDiv");
                                         }
                                     }
