@@ -20,13 +20,44 @@
 * Linux
 * ~~Mac~~ (In theory Electron supports it but I can't test Mac builds.)
 
+## Install the application
+### Linux
+* Download the latest AppImage. (**The github release is the only trustable resource!!!**)
+* Double-click on it, and enjoy! (The system will ask if you want to integrate the application with the system, your decision.)
+
+* If you have permission troubles
+    * Open the folder in terminal
+    * `chmod +x ./EXECUTABLE_NAME` Where the *EXECUTABLE_NAME* is what you downloaded.
+    
+### Windows
+* Download the latest release (for Windows).  (**The github release is the only trustable resource!!!**)
+* Install the application with the installer. (Pretty straightforward)
+* Run it and enjoy!
+
+
+### Mac
+* We don't have official releases, or build scripts for this you have to build it.
+
 ## Setup the project
-```
+```bash
 git clone https://github.com/thegergo02/gKreta.git
 cd gKreta
 npm install
 npm start
 ```
+
+## Build the project
+### Linux
+```bash
+npm run dist:linux
+```
+### Windows
+```bash
+npm run dist:win
+```
+(After building if you still want to start the debug build with `npm start`, you will have to...)
+* `rm -r ./node_modules/`
+* `npm install`
 
 ## Contributors
 | Name | Contribution |
