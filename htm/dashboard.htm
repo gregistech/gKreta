@@ -42,20 +42,16 @@
                 <a onclick="onNavClick('Export')"><script>document.write(locale["export"])</script></a>
                 <a onclick="onNavClick('Settings')"><script>document.write(locale["settings"])</script></a>
         </div>
-        <div id="content">
+        <div id="loadingDiv" style=" position: absolute;left: 50%;top:25%;transform: translateX(-50%);"><img src="../img/banner980150.png" /><img src="../img/loading.svg" style="  position: absolute;left: 50%;top:200%;transform: translateX(-50%);"/></div>
+        <div id="content" style="background-color:#1c1c1c;display: none;">
             <script>
                 window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
-
                 var isErrorPage = false;
                 var loading = true;
-
                 var studentData = "";
                 var timetableData = "";
-
                 var currentTab = "Dashboard";
-
                 var intervalID = "";
-
                 ipc.send("isGetStudentDataRunning");
 
                 ipc.on("isGetStudentDataRunning", (event, isGetStudentDataRunning) => {
@@ -78,7 +74,6 @@
                 });
 
                 function setupFirstWindow() {
-                    $('#content').empty();
                     var h1Name = $("<h1 style='margin-top: 30px; -webkit-user-select:none;'>" + studentData.Name + "<h1/>");
                     var hr = $("<hr />")
                     var tabDiv = $("<div id='tabDiv' />")
@@ -86,6 +81,9 @@
                     hr.appendTo('#content');
                     tabDiv.appendTo('#content');
                     displayTab(currentTab);
+                    $("#content").fadeIn(500, () => {
+                        $("#loadingDiv").remove();
+                    });
                     loading = false;
                 }
 
