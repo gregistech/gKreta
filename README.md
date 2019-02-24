@@ -13,11 +13,12 @@
     * Every note you get.
     * A settings panel.
     * Two languages: English and Hungarian. (Again, in the future I add more.)
+    * Exporting function.
 
 ## Currently supported platforms
 * Windows
 * Linux
-* Mac
+* ~~Mac~~ (In theory Electron supports it but I can't test Mac builds.)
 
 ## Setup the project
 ```
