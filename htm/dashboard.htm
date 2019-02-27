@@ -49,7 +49,8 @@
                 window.$ = window.jQuery = require("../modules/jquery-3.2.1.min.js");
                 var isErrorPage = false;
                 var loading = true;
-                var studentData = "";
+                var firstWindowGotSetup = false;
+                var  studentData = "";
                 var timetableData = "";
                 var currentTab = "Dashboard";
                 var intervalID = "";
@@ -75,18 +76,21 @@
                 });
 
                 function setupFirstWindow() {
-                    var h1Name = $("<h1 style='margin-top: 30px; -webkit-user-select:none;'>" + studentData.Name + "<h1/>");
-                    var hr = $("<hr />")
-                    var tabDiv = $("<div id='tabDiv' />")
-                    h1Name.appendTo('#content');
-                    hr.appendTo('#content');
-                    tabDiv.appendTo('#content');
-                    displayTab(currentTab);
-                    $("#content").fadeIn(500, () => {
-                        $("#loadingDiv").remove();
-                    });
-                    dateUtils = require("../modules/date-utils.js");
-                    loading = false;
+                    if (!firstWindowGotSetup) {
+                        var h1Name = $("<h1 style='margin-top: 30px; -webkit-user-select:none;'>" + studentData.Name + "<h1/>");
+                        var hr = $("<hr />")
+                        var tabDiv = $("<div id='tabDiv' />")
+                        h1Name.appendTo('#content');
+                        hr.appendTo('#content');
+                        tabDiv.appendTo('#content');
+                        displayTab(currentTab);
+                        $("#content").fadeIn(500, () => {
+                            $("#loadingDiv").remove();
+                        });
+                        dateUtils = require("../modules/date-utils.js");
+                        firstWindowGotSetup = true;
+                        loading = false;
+                    }
                 }
 
                 function capitalizeFirstLetter(string) {
