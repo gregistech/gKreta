@@ -2,45 +2,35 @@ const { app, BrowserWindow, net, ipcMain, shell, dialog } = require("electron");
 const events = require('events');
 const fs = require('fs');
 const keytar = require('keytar');
-
+const dateUtils = require("./modules/date-utils.js");
 var eventEmitter = new events.EventEmitter();
-
 var winDash = "";
 var win = "";
-
 var dirConf =  app.getPath('userData') + "/conf/";
 var dirHtm = "./htm/"
-
 var studentData = "";
 var timetableData = "";
-
 var isGetStudentDataRunning = false;
-
 var globalInstituteCode = "";
 var globalAuthToken = "";
 var globalRefreshToken = "";
-
 function startApplication () {
 	eventEmitter.setMaxListeners(Infinity);
 	createConfDir();
 	loadCorrectWindowAtStart();
-
 	ipcMain.on("saveSettings", (event,settingsJson) => {
 		saveSettings(settingsJson);
 		winDash.reload();
 	});
-
 	ipcMain.on("openExternalLink", (event, link) => {
 		shell.openExternal(link);
 	});
-
 	ipcMain.on("getInstitutes", (event) => {
 		getInstitutes();
 		eventEmitter.once('getInstitutesSuccess', (institutes) => {
 			win.webContents.send("getInstitutesSuccess",institutes);
 		});
 	});
-
 	ipcMain.on("registerStudent", (event, instituteCode, username, password) => {
 		saveSettings();
 		getAuthToken(instituteCode, username, password);
@@ -60,11 +50,9 @@ function startApplication () {
 			win.reload();
 		});
 	});
-
 	ipcMain.on("isGetStudentDataRunning", () => {
 		winDash.webContents.send("isGetStudentDataRunning", isGetStudentDataRunning);
 	});
-
 	ipcMain.on('getStudentData', (event) => {
 		isGetStudentDataRunning = true;
 		getLoginDetails()
@@ -90,14 +78,12 @@ function startApplication () {
 			});
 		});
 	});
-
 	ipcMain.on("getSettings", () => {
 		getSettings();
 		eventEmitter.once("getSettingsSuccess", (settings) => {
 			winDash.webContents.send("getSettingsSuccess", settings);
 		});
 	});
-
 	ipcMain.on("exportToFile", (event, exportType, exportFormat, exportData) => {
 		var savePath = dialog.showSaveDialog(winDash, {buttonLabel: "Export", defaultPath: exportType + "." + exportFormat});
 		const exportHandler = (type, format, data) => { 
@@ -143,7 +129,6 @@ function startApplication () {
 		exportHandler (exportType, exportFormat, exportData)
 	});
 }
-
 function loadCorrectWindowAtStart() {
 	var getInstituteCodePromise = keytar.getPassword("gkreta","instituteCode");
 	getInstituteCodePromise.then(
@@ -159,69 +144,25 @@ function loadCorrectWindowAtStart() {
 		}
 	);
 }
-
 function createConfDir() {
 	if (!fs.existsSync(dirConf))
 		fs.mkdirSync(dirConf);
 }
-
 function createWindow(htmFile) {
 	winL = new BrowserWindow({ width: 1200, height: 800, nodeIntegration: true, frame: false });
 	winL.loadFile(dirHtm + htmFile);
 	return winL;
 }
-
 function getTimetableData(instituteCode, authToken) {
-	var weekDetails = getWeekDetails(getMonday(new Date()));
-
+	var weekDetails = dateUtils.getWeekDetails();
 	var dateString = "/mapi/api/v1/Lesson?fromDate=" + weekDetails.startYear + "-" + weekDetails.startMonth + "-" + weekDetails.startDay + "&toDate=" + weekDetails.endYear + "-" + weekDetails.endMonth + "-" + weekDetails.endDay;
-
 	makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu", dateString,{ "Authorization": "Bearer " + authToken});
-
 	eventEmitter.once("makeNetRequestSuccess", function makeNetRequestSuccess(timetableData) {
 		eventEmitter.emit("getTimetableDataSuccess", JSON.parse(timetableData));
 	});
-
 	eventEmitter.once("makeNetRequestError", function makeNetRequestSuccess(errorCode) { 
 	});
 }
-
-function getWeekDetails(startDate) {
-	endDate = addDays(startDate, 6)
-
-	weekDetails = {
-		startYear: startDate.getFullYear(),
-		startMonth: AddZeroToMonth(startDate.getMonth()+1),
-		startDay: AddZeroToMonth(startDate.getDate()),
-
-		endYear: endDate.getFullYear(),
-		endMonth: AddZeroToMonth(endDate.getMonth()+1),
-		endDay: AddZeroToMonth(endDate.getDate())
-	}
-
-	return weekDetails;
-}
-
-function AddZeroToMonth(month) {
-	if (month < 10)
-		return "0" + month.toString();
-	else
-		return month;
-}
-
-function addDays(date, days) {
-	var result = new Date(date);
-	result.setDate(result.getDate() + days);
-	return result;
-}
-
-function getMonday(d) {
-	d = new Date(d);
-	var day = d.getDay(),
-			diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
-	return new Date(d.setDate(diff));
-}
-
 function getAuthToken(instituteCode, username, password) {
 	if (instituteCode === undefined || instituteCode === null) {
 		getLoginDetails();
@@ -242,7 +183,6 @@ function getAuthToken(instituteCode, username, password) {
 		});
 	}
 }
-
 function refreshStudentToken(instituteCode, refreshToken) {
 	postData = "refresh_token=" + refreshToken + "&grant_type=refresh_token&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56";
 	makeNetRequest("POST", "https:", instituteCode + ".e-kreta.hu", "/idp/api/v1/Token", {'Content-Type': 'application/x-www-form-urlencoded','Content-Length': Buffer.byteLength(postData)}, postData, instituteCode);
@@ -256,7 +196,6 @@ function refreshStudentToken(instituteCode, refreshToken) {
 		eventEmitter.emit("refreshTokenError");
 	});
 }
-
 function getStudentData(instituteCode, authToken) {
 	makeNetRequest("GET", "https:", instituteCode + ".e-kreta.hu","/mapi/api/v1/Student",{ "Authorization": "Bearer " + authToken}, null, {0: authToken, 1: instituteCode});
 
@@ -280,7 +219,6 @@ function getStudentData(instituteCode, authToken) {
 		}
 	});
 }
-
 function getInstitutes() {
 	makeNetRequest("GET","https:","kretaglobalmobileapi.ekreta.hu","/api/v1/Institute", {"apiKey": "7856d350-1fda-45f5-822d-e1a2f3f1acf0"});
 
@@ -293,7 +231,6 @@ function getInstitutes() {
 		eventEmitter.removeListener("makeNetRequestFinishedWithError", netRequestHandler);
 	});
 }
-
 function saveLoginDetails(instituteCode, authToken, refreshToken) {
 	globalAuthToken = authToken;
 	globalRefreshToken = refreshToken;
@@ -315,7 +252,6 @@ function saveLoginDetails(instituteCode, authToken, refreshToken) {
 	);
 	eventEmitter.emit("saveLoginDetailsSuccess");
 }
-
 function getLoginDetails() {
 	var getInstituteCodePromise = keytar.getPassword("gkreta", "instituteCode");
 	getInstituteCodePromise.then(
@@ -343,7 +279,6 @@ function getLoginDetails() {
 		}
 	);
 }
-
 function makeNetRequest(method, protocol, hostname, path, headers, post_data, otherArgs) {
 	try {
 			const request = net.request({
@@ -378,7 +313,6 @@ function makeNetRequest(method, protocol, hostname, path, headers, post_data, ot
 	catch (e) {
 	}
 }
-
 function saveSettings(settingsJson) {
 	if (settingsJson === null || settingsJson === undefined || settingsJson === "")
 		settingsJson = {"locale" : "en"};
@@ -388,12 +322,10 @@ function saveSettings(settingsJson) {
 	});
 	eventEmitter.emit("saveSettingsSuccess");
 }
-
 function getSettings() {
 	fs.readFile(dirConf + "/settings.json", "utf8", (err, data) => {
 		if (err) saveSettings();
 		eventEmitter.emit("getSettingsSuccess",JSON.parse(data));
 	 });
 }
-
 app.on('ready', startApplication);

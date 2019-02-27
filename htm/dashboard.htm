@@ -5,6 +5,7 @@
         <script>
         var settings = "";
         var locale = "";
+        var dateUtils = "";
 
         var ipc = require("electron").ipcRenderer;
         ipc.send("getSettings");
@@ -84,6 +85,7 @@
                     $("#content").fadeIn(500, () => {
                         $("#loadingDiv").remove();
                     });
+                    dateUtils = require("../modules/date-utils.js");
                     loading = false;
                 }
 
@@ -117,19 +119,6 @@
                             displayTab(tab);
                         }
                     }
-                }
-
-                function getMonday(d) {
-                    d = new Date(d);
-                    var day = d.getDay(),
-                        diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
-                    return new Date(d.setDate(diff));
-                }
-
-                function addDays(date, days) {
-                    var result = new Date(date);
-                    result.setDate(result.getDate() + days);
-                    return result;
                 }
 
                 function generateDiv(divName, other_args) {
@@ -207,9 +196,9 @@
 
                                 var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
                                 var daysOffset = 0;
-                                var currentMonday = getMonday(new Date());
+                                var currentMonday = dateUtils.getMonday(new Date());
                                 for (i = 0; i < 7;i++) {
-                                    var currentDay = addDays(currentMonday, daysOffset)
+                                    var currentDay = dateUtils.addDays(currentMonday, daysOffset)
                                     for (j = 0; j < Object.keys(timetableData).length;j++) {
                                         var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
                                         if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
@@ -335,9 +324,9 @@
                                         var lessonRows = new Array();
                                         var daysAndLessons = new Array(new Array(),new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
                                         var daysOffset = 0;
-                                        var currentMonday = getMonday(new Date());
+                                        var currentMonday = dateUtils.getMonday(new Date());
                                         for (i = 0; i < 7;i++) {
-                                            var currentDay = addDays(currentMonday, daysOffset)
+                                            var currentDay = dateUtils.addDays(currentMonday, daysOffset)
                                             for (j = 0; j < Object.keys(timetableData).length;j++) {
                                                 var currentLessonDate = timetableData[j].Date.substring(0, timetableData[j].Date.indexOf('T'))
                                                 if (currentDay.getDate() === new Date(currentLessonDate).getDate()) {
