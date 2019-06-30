@@ -1,3 +1,4 @@
+THIS PROJECT WAS ARCHIVED! REASON: LACK OF TIME, INTEREST AND OTHER PROJECTS.
 ![banner980150.png](https://raw.githubusercontent.com/thegergo02/gKreta/master/img/banner980150.png)
 
 <p align="center"><img src="https://img.shields.io/github/repo-size/thegergo02/gKreta.svg?colorB=red&style=for-the-badge" alt="repo-size">
